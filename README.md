@@ -68,17 +68,18 @@ Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.
 
 ``` r
-library(jmvReadWrite)
-library(jmv)
+library(jmvReadWrite);
+library(jmv);
 
-data = read_omv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"))
+fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
+data = read_omv(fleNme = fleOMV);
 jmv::ANOVA(
     formula = len ~ supp + dose + supp:dose,
     data = data,
     effectSize = c("omega"),
     modelTest = TRUE,
     homo = TRUE,
-    norm = TRUE)
+    norm = TRUE);
 #> 
 #>  ANOVA
 #> 
@@ -120,41 +121,23 @@ set, the analyses are stored in the attribute `syntax`. They can be used
 as shown in the following examples:
 
 ``` r
-library(jmvReadWrite)
-
-data = read_omv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
-# shows the syntax of the analyses from the .omv-file
-attr(data, 'syntax')
-#> [[1]]
-#> [1] "jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE, emMeans = ~ dose2:supp)"
-#> 
-#> [[2]]
-#> [1] "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"
-# runs the command of the first analysis
-eval(parse(text=attr(data, 'syntax')[[1]]))
-#> 
-#>  ANOVA
-#> 
-#>  ANOVA - len                                                                                      
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#>                     Sum of Squares    df    Mean Square    F            p             η²p         
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#>    Overall model         2740.1033     5      548.02067    41.557178    < .0000001                
-#>    supp                   205.3500     1      205.35000    15.571979     0.0002312    0.2238254   
-#>    dose2                 2426.4343     2     1213.21717    91.999965    < .0000001    0.7731092   
-#>    supp:dose2             108.3190     2       54.15950     4.106991     0.0218603    0.1320279   
-#>    Residuals              712.1060    54       13.18715                                           
-#>  ────────────────────────────────────────────────────────────────────────────────────────────────
-```
-
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-2.png" width="100%" style="display: block; margin: auto;" />
-
-``` r
-# runs the command of the second analysis and assigns the output from that analysis to the variable result2
-eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
-names(result2)
+library(jmvReadWrite);
+fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
+data = read_omv(fleNme = fleOMV, getSyn = TRUE);
+# please note that syntax extraction may not work on all systems
+# if the syntax couldn't be extracted, an empty list (length = 0) is returned,
+# otherwise, the syntax of the analyses from the .omv-file is shown and  
+# the commands of the first and the second analysis are run, with the
+# output of the second analysis assigned to the variable result2
+if (length(attr(data, 'syntax')) >= 2) {
+    attr(data, 'syntax')
+    eval(parse(text=attr(data, 'syntax')[[1]]))
+    eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
+    names(result2)
+    # → "main"      "assump"    "contrasts" "postHoc"   "emm"
+    # (the names of the five output tables)
+}
 #> [1] "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
-# → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
 ```
 
 The `jmvReadWrite`-package also enables you to write `.omv`-files in
@@ -170,12 +153,32 @@ variable labels) in addition.
 ``` r
 library(jmvReadWrite)
 
-write_omv(dtaFrm = data, fleNme = 'Trial.omv')
+# use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
+data("ToothGrowth");
+wrtDta = write_omv(ToothGrowth, "Trial.omv");
+names(wrtDta);
+#> [1] "mtaDta" "xtdDta" "dtaFrm"
+# → "mtaDta" "xtdDta" "dtaFrm"
+# returns a list with the metadata (mtaDta, e.g., column and data type),
+# the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
+# the purpose of these variables is merely for checking (understanding the file format)
+# and debugging
+
+# check whether the file was written to the disk, get the file information (size, etc.)
+# and delete the file afterwards
+list.files(".", "Trial.omv");
+#> [1] "Trial.omv"
+file.info("Trial.omv");
+#>           size isdir mode               mtime               ctime
+#> Trial.omv 2111 FALSE  660 2021-09-15 19:17:59 2021-09-15 19:17:59
+#>                         atime  uid  gid    uname   grname
+#> Trial.omv 2021-09-15 19:17:59 1000 1000 sjentsch sjentsch
+unlink("Trial.omv");
 ```
 
 -----
 
-[Changelog](https://github.com/sjentsch/jmvReadWrite/blob/main/CHANGELOG.md)
+[Changelog](https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md)
 
 ## Authors
 

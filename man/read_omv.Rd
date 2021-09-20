@@ -14,7 +14,7 @@ read_omv(
 )
 }
 \arguments{
-\item{fleNme}{name (incl. path) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")}
+\item{fleNme}{name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default: "")}
 
 \item{useFlt}{apply filters (remove the lines where the filter is set to 0; default: FALSE)}
 
@@ -22,9 +22,9 @@ read_omv(
 
 \item{sveAtt}{store attributes that are not required in the data set (if you want to write the same data set using write_omv; default – FALSE)}
 
-\item{getSyn}{extract syntax from the analyses in the 'jamovi'-file and store it in the attribute 'syntax' (default – FALSE)}
+\item{getSyn}{extract syntax from the analyses in the 'jamovi'-file and store it in the attribute "syntax" (default – FALSE)}
 
-\item{getHTM}{store index.html in the attribute 'HTML' (default – FALSE)}
+\item{getHTM}{store index.html in the attribute "HTML" (default – FALSE)}
 }
 \value{
 data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
@@ -34,18 +34,23 @@ Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
 }
 \examples{
 \dontrun{
-library(jmvReadWrite)
-fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data = read_omv(fleNme = fleOMV, getSyn = TRUE)
-# shows the syntax of the analyses from the .omv-file
-attr(data, 'syntax')
-# runs the command of the first analysis
-eval(parse(text=attr(data, 'syntax')[[1]]))
-# runs the command of the second analysis and assigns the output from that analysis
-# to the variable result2
-eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
-names(result2)
-# → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
+library(jmvReadWrite);
+fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
+data <- read_omv(fleNme = fleOMV, getSyn = TRUE);
+# if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
+# otherwise, the commands are shown and the first analysis is run, with the output
+# from the second analysis being assigned to the variable result
+if (length(attr(data, 'syntax')) >= 1) {
+    print(attr(data, "syntax"));
+    # the print-function is only used to force devtools::run_examples() to show output
+    eval(parse(text=paste0('result = ', attr(data, 'syntax')[[1]])));
+    # without assigning the output to a variable, the command would be:
+    # eval(parse(text=attr(data, 'syntax')[[1]]))
+    print(names(result));
+    print(result$main);
+    # → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
+    # (the names of the six output tables)
+}
 }
 
 }
