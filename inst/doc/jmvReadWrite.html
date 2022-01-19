@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2021-09-16" />
+<meta name="date" content="2022-01-19" />
 
 <title>R package jmvReadWrite</title>
 
@@ -318,7 +318,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2021-09-16</h4>
+<h4 class="date">2022-01-19</h4>
 
 
 
@@ -333,6 +333,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="how-to-use-the-package" class="section level2">
 <h2>How to use the package?</h2>
+<p><strong>read_omv</strong></p>
 <p>The following code uses the ToothGrowth-data set that is part of the data sets included in R (the current file contains some modifications though for testing the reading and writing routines: <code>read_omv</code> and <code>write_omv</code>). With this data set, a syntax to conduct an ANOVA is run.</p>
 <p>The results should be similar to those obtained when running the same analysis in jamovi (using the GUI). To do so, open the file menu (☰) choose <code>Open</code>, <code>Data Library</code> and <code>ToothGrowth</code>. Afterwards, click on the <code>ANOVA</code>-button in the <code>Analyses</code>-tab and choose <code>ANOVA</code>. There, you assign the variable <code>len</code> to <code>Dependent Variable</code> and <code>supp</code> and <code>dose</code> to <code>Fixed Factors</code>. Afterwards, you choose / tick <code>Overall Model Test</code> and <code>ω²</code>. Open the drop-down menu <code>Assumption Checks</code> and tick <code>Homogeneity test</code> and <code>Normality test</code>. The results should be identical apart from that the table output looks nicer in <code>jamovi</code> (not only text, as below), numbers are rounded and maybe one or two other cosmetic differences.</p>
 <p>If you want to copy the syntax generated in jamovi, you have to switch on the <a href="https://jamovi.readthedocs.io/en/latest/_pages/um_6_syntax_mode.html"><code>Syntax Mode</code></a>. Afterwards, the syntax is shown at the top of the analysis and can be copied from there.</p>
@@ -393,34 +394,59 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb4-11" title="11">    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text=</span><span class="kw">attr</span>(data, <span class="st">&#39;syntax&#39;</span>)[[<span class="dv">1</span>]]))</a>
 <a class="sourceLine" id="cb4-12" title="12">    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text=</span><span class="kw">paste0</span>(<span class="st">&#39;result2 = &#39;</span>, <span class="kw">attr</span>(data, <span class="st">&#39;syntax&#39;</span>)[[<span class="dv">2</span>]])))</a>
 <a class="sourceLine" id="cb4-13" title="13">    <span class="kw">names</span>(result2)</a>
-<a class="sourceLine" id="cb4-14" title="14">    <span class="co"># → &quot;main&quot;      &quot;assump&quot;    &quot;contrasts&quot; &quot;postHoc&quot;   &quot;emm&quot;</span></a>
+<a class="sourceLine" id="cb4-14" title="14">    <span class="co"># -&gt; &quot;main&quot;      &quot;assump&quot;    &quot;contrasts&quot; &quot;postHoc&quot;   &quot;emm&quot;</span></a>
 <a class="sourceLine" id="cb4-15" title="15">    <span class="co"># (the names of the five output tables)</span></a>
 <a class="sourceLine" id="cb4-16" title="16">}</a>
 <a class="sourceLine" id="cb4-17" title="17"><span class="co">#&gt; [1] &quot;main&quot;      &quot;assump&quot;    &quot;contrasts&quot; &quot;postHoc&quot;   &quot;emm&quot;       &quot;residsOV&quot;</span></a></code></pre></div>
-<p>The <code>jmvReadWrite</code>-package also enables you to write <code>.omv</code>-files in order to use them in <code>jamovi</code>. Let’s assume that you have a large collection of log-files (e.g., from an experiment) that you compile and process (summarize, filter, etc.) in R in order to later analyse them in <code>jamovi</code>. You will have those processed log-files stored in a data frame (called, e.g., <code>data</code>) which you then write to a file that you can open in jamovi afterwards. Although jamovi reads R-data files (.RData, .rda, .rds) <code>write_omv</code> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition.</p>
+<p><strong>write_omv</strong></p>
+<p>The <code>jmvReadWrite</code>-package also enables you to write <code>.omv</code>-files in order to use them in <code>jamovi</code>. Let’s assume that you have a large collection of log-files (e.g., from an experiment) that you compile and process (summarize, filter, etc.) in R in order to later analyse them in <code>jamovi</code>. You will have those processed log-files stored in a data frame (called, e.g., <code>data</code>) which you then write to a file that you can open in jamovi afterwards.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">library</span>(jmvReadWrite)</a>
 <a class="sourceLine" id="cb5-2" title="2"></a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="co"># use the data set &quot;ToothGrowth&quot; and, if it exists, write it as jamovi-file using write_omv()</span></a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="kw">data</span>(<span class="st">&quot;ToothGrowth&quot;</span>);</a>
-<a class="sourceLine" id="cb5-5" title="5">wrtDta =<span class="st"> </span><span class="kw">write_omv</span>(ToothGrowth, <span class="st">&quot;Trial.omv&quot;</span>);</a>
-<a class="sourceLine" id="cb5-6" title="6"><span class="kw">names</span>(wrtDta);</a>
-<a class="sourceLine" id="cb5-7" title="7"><span class="co">#&gt; [1] &quot;mtaDta&quot; &quot;xtdDta&quot; &quot;dtaFrm&quot;</span></a>
-<a class="sourceLine" id="cb5-8" title="8"><span class="co"># → &quot;mtaDta&quot; &quot;xtdDta&quot; &quot;dtaFrm&quot;</span></a>
-<a class="sourceLine" id="cb5-9" title="9"><span class="co"># returns a list with the metadata (mtaDta, e.g., column and data type),</span></a>
-<a class="sourceLine" id="cb5-10" title="10"><span class="co"># the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)</span></a>
-<a class="sourceLine" id="cb5-11" title="11"><span class="co"># the purpose of these variables is merely for checking (understanding the file format)</span></a>
-<a class="sourceLine" id="cb5-12" title="12"><span class="co"># and debugging</span></a>
-<a class="sourceLine" id="cb5-13" title="13"></a>
-<a class="sourceLine" id="cb5-14" title="14"><span class="co"># check whether the file was written to the disk, get the file information (size, etc.)</span></a>
-<a class="sourceLine" id="cb5-15" title="15"><span class="co"># and delete the file afterwards</span></a>
-<a class="sourceLine" id="cb5-16" title="16"><span class="kw">list.files</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;Trial.omv&quot;</span>);</a>
-<a class="sourceLine" id="cb5-17" title="17"><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></a>
-<a class="sourceLine" id="cb5-18" title="18"><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a>
-<a class="sourceLine" id="cb5-19" title="19"><span class="co">#&gt;           size isdir mode               mtime               ctime</span></a>
-<a class="sourceLine" id="cb5-20" title="20"><span class="co">#&gt; Trial.omv 2111 FALSE  644 2021-09-16 08:57:36 2021-09-16 08:57:36</span></a>
-<a class="sourceLine" id="cb5-21" title="21"><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></a>
-<a class="sourceLine" id="cb5-22" title="22"><span class="co">#&gt; Trial.omv 2021-09-16 08:57:36 1000 1000 sjentsch sjentsch</span></a>
-<a class="sourceLine" id="cb5-23" title="23"><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a></code></pre></div>
+<a class="sourceLine" id="cb5-3" title="3"><span class="co"># use the data set &quot;ToothGrowth&quot; and, if it exists, write it as jamovi-file</span></a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="co"># using write_omv()</span></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="kw">data</span>(<span class="st">&quot;ToothGrowth&quot;</span>);</a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="co"># &quot;retDbg&quot; has to be set in order to return debug information to wrtDta</span></a>
+<a class="sourceLine" id="cb5-7" title="7">wrtDta =<span class="st"> </span><span class="kw">write_omv</span>(ToothGrowth, <span class="st">&quot;Trial.omv&quot;</span>, <span class="dt">retDbg =</span> <span class="ot">TRUE</span>);</a>
+<a class="sourceLine" id="cb5-8" title="8"><span class="kw">names</span>(wrtDta);</a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="co">#&gt; [1] &quot;mtaDta&quot; &quot;xtdDta&quot; &quot;dtaFrm&quot;</span></a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="co"># -&gt; &quot;mtaDta&quot; &quot;xtdDta&quot; &quot;dtaFrm&quot;</span></a>
+<a class="sourceLine" id="cb5-11" title="11"><span class="co"># this debug information contains a list with the metadata (&quot;mtaDta&quot;, e.g.,</span></a>
+<a class="sourceLine" id="cb5-12" title="12"><span class="co"># column and data type), the extended data (&quot;xtdDta&quot;, e.g., variable lables),</span></a>
+<a class="sourceLine" id="cb5-13" title="13"><span class="co"># and the data frame (dtaFrm) for checking (understanding the file format) and</span></a>
+<a class="sourceLine" id="cb5-14" title="14"><span class="co"># debugging</span></a>
+<a class="sourceLine" id="cb5-15" title="15"></a>
+<a class="sourceLine" id="cb5-16" title="16"><span class="co"># check whether the file was written to the disk, get the file information (size, etc.)</span></a>
+<a class="sourceLine" id="cb5-17" title="17"><span class="co"># and delete the file afterwards</span></a>
+<a class="sourceLine" id="cb5-18" title="18"><span class="kw">list.files</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;Trial.omv&quot;</span>);</a>
+<a class="sourceLine" id="cb5-19" title="19"><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></a>
+<a class="sourceLine" id="cb5-20" title="20"><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a>
+<a class="sourceLine" id="cb5-21" title="21"><span class="co">#&gt;           size isdir mode               mtime               ctime</span></a>
+<a class="sourceLine" id="cb5-22" title="22"><span class="co">#&gt; Trial.omv 2238 FALSE  644 2022-01-19 16:11:57 2022-01-19 16:11:57</span></a>
+<a class="sourceLine" id="cb5-23" title="23"><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></a>
+<a class="sourceLine" id="cb5-24" title="24"><span class="co">#&gt; Trial.omv 2022-01-19 16:11:57 1000 1000 sjentsch sjentsch</span></a>
+<a class="sourceLine" id="cb5-25" title="25"><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a></code></pre></div>
+<p>Although jamovi reads R-data files (.RData, .rda, .rds) <code>write_omv</code> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to set the <code>sveAtt</code>-attribute.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="co"># essential meta-data to ensure that the written file looks and works like the</span></a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="co"># original file (plus you modifications)</span></a>
+<a class="sourceLine" id="cb6-4" title="4">fleOMV =<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;ToothGrowth.omv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;jmvReadWrite&quot;</span>);</a>
+<a class="sourceLine" id="cb6-5" title="5">data =<span class="st"> </span><span class="kw">read_omv</span>(<span class="dt">fleNme =</span> fleOMV, <span class="dt">sveAtt =</span> <span class="ot">TRUE</span>);</a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="co"># shows the names of the attributes for the whole data set (e.g., number of</span></a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="co"># rows and columns) and the names of the attributes of the first column</span></a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="kw">names</span>(<span class="kw">attributes</span>(data));</a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="co">#&gt; [1] &quot;row.names&quot;       &quot;names&quot;           &quot;class&quot;           &quot;fltLst&quot;         </span></a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="co">#&gt; [5] &quot;variable.labels&quot; &quot;removedRows&quot;     &quot;addedRows&quot;       &quot;transforms&quot;</span></a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="kw">names</span>(<span class="kw">attributes</span>(data[[<span class="dv">1</span>]]));</a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="co">#&gt;  [1] &quot;missingValues&quot;  &quot;name&quot;           &quot;id&quot;             &quot;columnType&quot;    </span></a>
+<a class="sourceLine" id="cb6-13" title="13"><span class="co">#&gt;  [5] &quot;dataType&quot;       &quot;measureType&quot;    &quot;formula&quot;        &quot;formulaMessage&quot;</span></a>
+<a class="sourceLine" id="cb6-14" title="14"><span class="co">#&gt;  [9] &quot;parentId&quot;       &quot;width&quot;          &quot;type&quot;           &quot;importName&quot;    </span></a>
+<a class="sourceLine" id="cb6-15" title="15"><span class="co">#&gt; [13] &quot;description&quot;    &quot;transform&quot;      &quot;edits&quot;          &quot;filterNo&quot;      </span></a>
+<a class="sourceLine" id="cb6-16" title="16"><span class="co">#&gt; [17] &quot;active&quot;</span></a>
+<a class="sourceLine" id="cb6-17" title="17"><span class="co">#</span></a>
+<a class="sourceLine" id="cb6-18" title="18"><span class="co"># perhaps do some modifications to the file here and write it back afterwards</span></a>
+<a class="sourceLine" id="cb6-19" title="19"><span class="kw">write_omv</span>(data, <span class="st">&#39;Trial.omv&#39;</span>);</a>
+<a class="sourceLine" id="cb6-20" title="20"><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a></code></pre></div>
+<p>If <code>Trial.omv</code> in the example above would have been kept, it should look like the original file (plus your possible modifications). If you, e.g., added a new column, you could adjust some attributes (e.g., to enforce a specific <code>columnType</code> or <code>measurementType</code>): just look at how attributes are stored for other columns.</p>
 </div>
 
 
