@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2022-01-19" />
+<meta name="date" content="2022-01-20" />
 
 <title>R package jmvReadWrite</title>
 
@@ -318,7 +318,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2022-01-19</h4>
+<h4 class="date">2022-01-20</h4>
 
 
 
@@ -421,9 +421,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb5-19" title="19"><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></a>
 <a class="sourceLine" id="cb5-20" title="20"><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a>
 <a class="sourceLine" id="cb5-21" title="21"><span class="co">#&gt;           size isdir mode               mtime               ctime</span></a>
-<a class="sourceLine" id="cb5-22" title="22"><span class="co">#&gt; Trial.omv 2238 FALSE  644 2022-01-19 16:11:57 2022-01-19 16:11:57</span></a>
+<a class="sourceLine" id="cb5-22" title="22"><span class="co">#&gt; Trial.omv 2238 FALSE  644 2022-01-20 20:02:51 2022-01-20 20:02:51</span></a>
 <a class="sourceLine" id="cb5-23" title="23"><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></a>
-<a class="sourceLine" id="cb5-24" title="24"><span class="co">#&gt; Trial.omv 2022-01-19 16:11:57 1000 1000 sjentsch sjentsch</span></a>
+<a class="sourceLine" id="cb5-24" title="24"><span class="co">#&gt; Trial.omv 2022-01-20 20:02:51 1000 1000 sjentsch sjentsch</span></a>
 <a class="sourceLine" id="cb5-25" title="25"><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <code>write_omv</code> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to set the <code>sveAtt</code>-attribute.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></a>

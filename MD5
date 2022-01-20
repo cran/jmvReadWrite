@@ -1,11 +1,11 @@
-fbd652e286e862dd456dca7cbc339fc0 *DESCRIPTION
+d27b6e3dc57cc9197ec48577f5a38c99 *DESCRIPTION
 d71e858d92ac0da2b4ad7ff4d4964a8d *NAMESPACE
-b94a7cfb76d811ebd688ea53695252f9 *NEWS.md
+3d6a07592f1213aa66ce349833961053 *NEWS.md
 94378f862236dbb1a6a24f7a46f85899 *R/data.R
 9ba799abd2378375b4722ef6c76dc14d *R/globals.R
-cd9ab9f0ffeec3aa86dc66eb063260a8 *R/read_omv.R
-52cbd97fc3bab9b2a253a4d566a5b84c *R/write_omv.R
-4c6dae8dfa7a347448147aae7623974b *README.md
+afa61c0b9040a2ad1f215c7d299ddbe5 *R/read_omv.R
+6470df5e53eeec59473661497c1fe64c *R/write_omv.R
+f5787624c6d2644add53ab9891d41208 *README.md
 33df5c9941983ee058248b53e214278f *build/vignette.rds
 5165cd10b3b8211e9bd317100b10d7a3 *data/AlbumSales.rda
 7b60e0a281ba91455f5f80554060ea73 *data/ToothGrowth.rda
@@ -14,7 +14,7 @@ cd9ab9f0ffeec3aa86dc66eb063260a8 *R/read_omv.R
 c13695b756eba9b10516331c3d512c44 *inst/WORDLIST
 ac5484f68ef0bffe45004b7db7e243cd *inst/doc/jmvReadWrite.R
 4f2f3dc4528c55d1c51ed74975bb5c5e *inst/doc/jmvReadWrite.Rmd
-5a2dc399b8330d1a89c4fe597c7d23d4 *inst/doc/jmvReadWrite.html
+61619b06e0352178a0daefec2b978a71 *inst/doc/jmvReadWrite.html
 76645204ffe6d04562c0d49ca4ad6fe7 *inst/extdata/AlbumSales.omv
 30e005f28c4a689cd640a025351220d8 *inst/extdata/ToothGrowth.omv
 490cf2cb639ec5d134f7f249751c54d3 *inst/extdata/bfi_sample.omv
@@ -26,5 +26,5 @@ bf770caa712294de888e68dce547b185 *man/bfi_sample2.Rd
 b3070af8e425df86e6d168effcfc051c *man/figures/README-unnamed-chunk-7-1.png
 c66b445f3f6f9792d7c33fb1993d2027 *man/figures/README-unnamed-chunk-7-2.png
 75da837084d99a629e744e52e9aa8176 *man/read_omv.Rd
-b933e63e7be21619d3e66f62e8e111df *man/write_omv.Rd
+83ac099473d08598e100fed389b3d3e1 *man/write_omv.Rd
 4f2f3dc4528c55d1c51ed74975bb5c5e *vignettes/jmvReadWrite.Rmd
