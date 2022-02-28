@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2022-02-13" />
+<meta name="date" content="2022-02-28" />
 
 <title>R package jmvReadWrite</title>
 
@@ -318,7 +318,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2022-02-13</h4>
+<h4 class="date">2022-02-28</h4>
 
 
 
@@ -327,7 +327,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2>Installation</h2>
 <p>You can either install a stable version of <code>jmvReadWrite</code> which is available on <a href="https://cran.r-project.org/package=jmvReadWrite">CRAN</a> using the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;jmvReadWrite&quot;</span>)</a></code></pre></div>
-<p>or you can install the development version of the <code>jmvReadWrite</code> package from <a href="https://github.com/sjentsch/jmvReadWrite">GitHub</a>:</p>
+<p>or you can install the development version of the <code>jmvReadWrite</code> package from <a href="https://github.com/sjentsch/jmvReadWrite/">GitHub</a>:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="cf">if</span>(<span class="op">!</span><span class="kw">require</span>(devtools)) <span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)</a>
 <a class="sourceLine" id="cb2-2" title="2">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;sjentsch/jmvReadWrite&quot;</span>)</a></code></pre></div>
 </div>
@@ -336,7 +336,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p><br /> <a href="https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html"><strong>read_omv</strong></a></p>
 <p>The following code uses the ToothGrowth-data set that is part of the data sets included in R (the current file contains some modifications though for testing the reading and writing routines: <code>read_omv</code> and <code>write_omv</code>). With this data set, a syntax to conduct an ANOVA is run.</p>
 <p>The results should be similar to those obtained when running the same analysis in jamovi (using the GUI). To do so, open the file menu (☰) choose <code>Open</code>, <code>Data Library</code> and <code>ToothGrowth</code>. Afterwards, click on the <code>ANOVA</code>-button in the <code>Analyses</code>-tab and choose <code>ANOVA</code>. There, you assign the variable <code>len</code> to <code>Dependent Variable</code> and <code>supp</code> and <code>dose</code> to <code>Fixed Factors</code>. Afterwards, you choose / tick <code>Overall Model Test</code> and <code>ω²</code>. Open the drop-down menu <code>Assumption Checks</code> and tick <code>Homogeneity test</code> and <code>Normality test</code>. The results should be identical apart from that the table output looks nicer in <code>jamovi</code> (not only text, as below), numbers are rounded and maybe one or two other cosmetic differences.</p>
-<p>If you want to copy the syntax generated in jamovi, you have to switch on the <a href="https://jamovi.readthedocs.io/en/latest/_pages/um_6_syntax_mode.html"><code>Syntax Mode</code></a>. Afterwards, the syntax is shown at the top of the analysis and can be copied from there.</p>
+<p>If you want to copy the syntax generated in jamovi, you have to switch on the <a href="https://jamovi.readthedocs.io/en/latest/usermanual/um_6_syntax_mode.html"><code>Syntax Mode</code></a>. Afterwards, the syntax is shown at the top of the analysis and can be copied from there.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(jmvReadWrite);</a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="kw">library</span>(jmv);</a>
 <a class="sourceLine" id="cb3-3" title="3"></a>
@@ -429,9 +429,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb5-19" title="19"><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></a>
 <a class="sourceLine" id="cb5-20" title="20"><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a>
 <a class="sourceLine" id="cb5-21" title="21"><span class="co">#&gt;           size isdir mode               mtime               ctime</span></a>
-<a class="sourceLine" id="cb5-22" title="22"><span class="co">#&gt; Trial.omv 2199 FALSE  644 2022-02-13 01:56:08 2022-02-13 01:56:08</span></a>
+<a class="sourceLine" id="cb5-22" title="22"><span class="co">#&gt; Trial.omv 2199 FALSE  644 2022-02-28 18:34:26 2022-02-28 18:34:26</span></a>
 <a class="sourceLine" id="cb5-23" title="23"><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></a>
-<a class="sourceLine" id="cb5-24" title="24"><span class="co">#&gt; Trial.omv 2022-02-13 01:56:08 1000 1000 sjentsch sjentsch</span></a>
+<a class="sourceLine" id="cb5-24" title="24"><span class="co">#&gt; Trial.omv 2022-02-28 18:34:26 1000 1000 sjentsch sjentsch</span></a>
 <a class="sourceLine" id="cb5-25" title="25"><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>);</a></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></a>
