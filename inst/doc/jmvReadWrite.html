@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2022-05-21" />
+<meta name="date" content="2022-08-08" />
 
 <title>R package jmvReadWrite</title>
 
@@ -349,11 +349,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2022-05-21</h4>
+<h4 class="date">2022-08-08</h4>
 
 
 
-<p>The R-package <code>jmvReadWrite</code> reads and writes the .omv-files that are used by the statistical spreadsheet <code>jamovi</code> (www.jamovi.org). It is supposed to ease using syntax for statistical analyses created using the GUI in <code>jamovi</code> in connection with the R-library <code>jmv</code>.</p>
+<p>The R-package <code>jmvReadWrite</code> reads and writes the .omv-files that are used by the statistical spreadsheet <code>jamovi</code> (<a href="https://www.jamovi.org" class="uri">https://www.jamovi.org</a>). It is supposed to ease using syntax for statistical analyses created using the GUI in <code>jamovi</code> in connection with the R-library <code>jmv</code>.</p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>You can either install a stable version of <code>jmvReadWrite</code> which is available on <a href="https://cran.r-project.org/package=jmvReadWrite">CRAN</a> using the following command:</p>
@@ -364,7 +364,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="how-to-use-the-package" class="section level2">
 <h2>How to use the package?</h2>
-<p><br /> <a href="https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html"><strong>read_omv</strong></a></p>
+<p><br /></p>
+<p><a href="https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html"><strong>read_omv</strong></a></p>
 <p>The following code uses the ToothGrowth-data set that is part of the data sets included in R (the current file contains some modifications though for testing the reading and writing routines: <code>read_omv</code> and <code>write_omv</code>). With this data set, a syntax to conduct an ANOVA is run.</p>
 <p>The results should be similar to those obtained when running the same analysis in jamovi (using the GUI). To do so, open the file menu (☰) choose <code>Open</code>, <code>Data Library</code> and <code>ToothGrowth</code>. Afterwards, click on the <code>ANOVA</code>-button in the <code>Analyses</code>-tab and choose <code>ANOVA</code>. There, you assign the variable <code>len</code> to <code>Dependent Variable</code> and <code>supp</code> and <code>dose</code> to <code>Fixed Factors</code>. Afterwards, you choose / tick <code>Overall Model Test</code> and <code>ω²</code>. Open the drop-down menu <code>Assumption Checks</code> and tick <code>Homogeneity test</code> and <code>Normality test</code>. The results should be identical apart from that the table output looks nicer in <code>jamovi</code> (not only text, as below), numbers are rounded and maybe one or two other cosmetic differences.</p>
 <p>If you want to copy the syntax generated in jamovi, you have to switch on the <a href="https://jamovi.readthedocs.io/en/latest/usermanual/um_6_syntax_mode.html"><code>Syntax Mode</code></a>. Afterwards, the syntax is shown at the top of the analysis and can be copied from there.</p>
@@ -460,9 +461,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>);</span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 1564 FALSE  644 2022-05-21 21:39:30 2022-05-21 21:39:30</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 1563 FALSE  644 2022-08-08 13:10:27 2022-08-08 13:10:27</span></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2022-05-21 21:39:30 1000 1000 sjentsch sjentsch</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2022-08-08 13:10:27 1000 1000 sjentsch sjentsch</span></span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>);</span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></span>
@@ -473,7 +474,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co"># shows the names of the attributes for the whole data set (e.g., number of</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co"># rows and columns) and the names of the attributes of the first column</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="kw">names</span>(<span class="kw">attributes</span>(data));</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;row.names&quot;   &quot;names&quot;       &quot;class&quot;       &quot;fltLst&quot;      &quot;removedRows&quot;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;names&quot;       &quot;row.names&quot;   &quot;class&quot;       &quot;fltLst&quot;      &quot;removedRows&quot;</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="co">#&gt; [6] &quot;addedRows&quot;   &quot;transforms&quot;</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="kw">names</span>(<span class="kw">attributes</span>(data[[<span class="dv">1</span>]]));</span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;missingValues&quot;  &quot;name&quot;           &quot;id&quot;             &quot;columnType&quot;    </span></span>

@@ -25,9 +25,9 @@ knitr::opts_chunk$set(echo = TRUE,
 
 
 The R-package `jmvReadWrite` reads and writes the .omv-files that are used by
-the statistical spreadsheet `jamovi` (www.jamovi.org). It is supposed to ease
-using syntax for statistical analyses created using the GUI in `jamovi` in
-connection with the R-library `jmv`.
+the statistical spreadsheet `jamovi` (<https://www.jamovi.org>). It is supposed
+to ease using syntax for statistical analyses created using the GUI in `jamovi`
+in connection with the R-library `jmv`.
 
 
 ## Installation
@@ -50,6 +50,7 @@ devtools::install_github("sjentsch/jmvReadWrite")
  
 ## How to use the package?
 <br />
+
 [**read_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 
 The following code uses the ToothGrowth-data set that is part of the data sets

@@ -1,8 +1,10 @@
 AGPL
 bfi
 Changelog
+CMD
 codecov
 Codecov
+cond
 com
 CR
 csv
@@ -14,7 +16,6 @@ etc
 extdata
 fleInp
 fleOut
-https
 idvar
 ipip
 jamovi
@@ -53,6 +54,7 @@ ToothGrowth
 TSV
 VAR
 varBy
+varExc
 varID
 varLst
 vars
