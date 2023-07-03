@@ -44,7 +44,7 @@
 
 write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     if (is.null(dtaFrm))  stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
-    if (! nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
+    if (!nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
 
     # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
     fleOut <- nrmFle(fleOut)
@@ -281,7 +281,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 }
 
 fmtJSON <- function(txtJSON = "") {
-    gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON)))))
+    gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", jsonlite::toJSON(txtJSON, auto_unbox = TRUE)))))
 }
 
 htmTxt <- function() {

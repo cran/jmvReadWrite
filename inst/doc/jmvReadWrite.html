@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2023-06-26" />
+<meta name="date" content="2023-07-03" />
 
 <title>R package jmvReadWrite</title>
 
@@ -356,7 +356,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2023-06-26</h4>
+<h4 class="date">2023-07-03</h4>
 
 
 
@@ -468,9 +468,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 1564 FALSE  644 2023-06-26 13:20:38 2023-06-26 13:20:38</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 1564 FALSE  644 2023-07-03 08:35:54 2023-07-03 08:35:54</span></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2023-06-26 13:20:38 1000 1000 sjentsch sjentsch</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2023-07-03 08:35:54 1000 1000 sjentsch sjentsch</span></span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></span>
@@ -504,6 +504,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/merge_cols_omv.html"><code>merge_cols_omv</code></a>: Add variables from several data sets (i.e., the variables / columns in the second, etc. input data set are added as columns to the first data set).</p></li>
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html"><code>merge_rows_omv</code></a>: Add cases from several data sets (i.e., the cases / rows in the second, etc. data set are added as rows to the first data set).</p></li>
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html"><code>sort_omv</code></a>: Sort a data set according to one or more variable(s).</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/transpose_omv.html"><code>transpose_omv</code></a>: Transpose a data set (make rows into columns and vice versa).</p></li>
 </ul>
 </div>
 

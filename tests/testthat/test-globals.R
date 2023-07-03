@@ -1,6 +1,6 @@
 test_that("globals work", {
     nmeOMV <- paste0(tempfile(), ".omv")
-    write_omv(setNames(as.data.frame(matrix(runif(200, -10, 10), ncol = 8)), paste0("X_", sprintf("%02d", 1:8))), nmeOMV)
+    write_omv(stats::setNames(as.data.frame(matrix(runif(200, -10, 10), ncol = 8)), paste0("X_", sprintf("%02d", 1:8))), nmeOMV)
     expect_equal(adjArg("read_omv", list(fleInp = "Trial_dflArg.omv", getSyn = TRUE, getHTM = TRUE),
                                     list(fleInp = "Trial_varArg.omv", sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE),
                                     fxdArg = c("fleInp", "getSyn")),
@@ -13,8 +13,6 @@ test_that("globals work", {
     expect_true(chkFle(nmeOMV, isZIP = TRUE))
     expect_true(chkFle(nmeOMV, fleCnt = "meta"))
     expect_true(chkVar(jmvReadWrite::ToothGrowth, c("len", "dose", "supp")))
-
-    # test cases for code coverage ============================================================================================================================
     expect_error(chkDir(file.path(tempdir(), "not", "file")))
     expect_error(chkFle(NA))
     expect_error(chkFle("", isZIP = 1))
@@ -27,8 +25,30 @@ test_that("globals work", {
     expect_error(chkVar(dtaFrm = data.frame(A = runif(100)), varNme = c("A", "B")))
     expect_error(fmtFlI(fleInp = tempfile(), minLng = 2))
     expect_error(fmtFlI(fleInp = c(tempfile(), tempfile()), maxLng = 1))
-    expect_equal(fmtFlO(fleOut = "", fleInp = "Trial.omv", rplExt = ".new"), "Trial.new")
+    expect_equal(fmtFlO(fleOut = "", fleInp = "Trial.omv", rplExt = "_adj.omv"), "Trial_adj.omv")
     expect_error(fmtFlO(fleOut = "", fleInp = ""))
+    expect_error(fmtFlO(fleOut = "Trial"))
+    expect_error(fmtFlO(fleOut = "Trial.rds"))
+    expect_error(fmtFlO(fleOut = "", fleInp = "Trial.omv", rplExt = "_adj.csv"))
     expect_error(fcnArg(c("stats::sd", "stats::mean", "C")))
     expect_error(capture.output(setAtt(attLst = "Trial", inpObj = list(), outObj = outObj)))
+    expect_equal(names(attributes(rmvAtt(jmvReadWrite::AlbumSales))), c("names", "class", "row.names"))
+    expect_equal(setdiff(names(attributes(jmvReadWrite::AlbumSales)), names(attributes(rmvAtt(jmvReadWrite::AlbumSales)))), c("datalabel", "var.labels"))
+    unlink(nmeOMV)
+
+    expect_error(inp2DF(dtaInp = 1))
+    inpDF <- jmvReadWrite::AlbumSales
+    expect_error(inp2DF(dtaInp = inpDF))
+    expect_error(inp2DF(dtaInp = inpDF, fleOut = 1))
+    attr(inpDF, "fleOut") <- "Trial1.omv"
+    expect_equal(basename(attr(inp2DF(dtaInp = inpDF),                        "fleOut")), "Trial1.omv")
+    expect_equal(basename(attr(inp2DF(dtaInp = inpDF, fleOut = "Trial2.omv"), "fleOut")), "Trial2.omv")
+    inpNme <- file.path("..", "ToothGrowth.omv")
+    expect_s3_class(inp2DF(fleInp = inpNme), "data.frame")
+    expect_equal(dim(inp2DF(fleInp = inpNme)), c(60, 13))
+    expect_equal(basename(attr(inp2DF(dtaInp = inpNme), "fleOut")), "ToothGrowth_chgd.omv")
+    expect_equal(basename(attr(inp2DF(fleInp = inpNme), "fleOut")), "ToothGrowth_chgd.omv")
+    expect_equal(basename(attr(inp2DF(fleInp = inpNme, sfxOut = "_trial.omv"), "fleOut")), "ToothGrowth_trial.omv")
+    expect_equal(basename(attr(inp2DF(fleInp = inpNme, fleOut = "Trial.omv"), "fleOut")),  "Trial.omv")
+    expect_equal(basename(attr(inp2DF(fleInp = inpNme, fleOut = "Trial.omv", sfxOut = "_trial.omv"), "fleOut")), "Trial.omv")
 })
