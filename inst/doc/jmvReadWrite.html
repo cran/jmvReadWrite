@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2023-07-03" />
+<meta name="date" content="2023-07-16" />
 
 <title>R package jmvReadWrite</title>
 
@@ -356,7 +356,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2023-07-03</h4>
+<h4 class="date">2023-07-16</h4>
 
 
 
@@ -468,9 +468,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 1564 FALSE  644 2023-07-03 08:35:54 2023-07-03 08:35:54</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 1573 FALSE  644 2023-07-16 00:45:39 2023-07-16 00:45:39</span></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2023-07-03 08:35:54 1000 1000 sjentsch sjentsch</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2023-07-16 00:45:39 1000 1000 sjentsch sjentsch</span></span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></span>
@@ -484,10 +484,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;names&quot;       &quot;row.names&quot;   &quot;class&quot;       &quot;fltLst&quot;      &quot;removedRows&quot;</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="co">#&gt; [6] &quot;addedRows&quot;   &quot;transforms&quot;</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="kw">names</span>(<span class="kw">attributes</span>(data[[<span class="dv">1</span>]]))</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;missingValues&quot;  &quot;name&quot;           &quot;id&quot;             &quot;columnType&quot;    </span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="co">#&gt;  [5] &quot;dataType&quot;       &quot;measureType&quot;    &quot;formula&quot;        &quot;formulaMessage&quot;</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="co">#&gt;  [9] &quot;parentId&quot;       &quot;width&quot;          &quot;type&quot;           &quot;importName&quot;    </span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="co">#&gt; [13] &quot;description&quot;    &quot;transform&quot;      &quot;edits&quot;          &quot;filterNo&quot;      </span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;name&quot;           &quot;id&quot;             &quot;columnType&quot;     &quot;dataType&quot;      </span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="co">#&gt;  [5] &quot;measureType&quot;    &quot;formula&quot;        &quot;formulaMessage&quot; &quot;parentId&quot;      </span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="co">#&gt;  [9] &quot;width&quot;          &quot;type&quot;           &quot;importName&quot;     &quot;description&quot;   </span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="co">#&gt; [13] &quot;transform&quot;      &quot;edits&quot;          &quot;missingValues&quot;  &quot;filterNo&quot;      </span></span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a><span class="co">#&gt; [17] &quot;active&quot;</span></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="co">#</span></span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a><span class="co"># perhaps do some modifications to the file here and write it back afterwards</span></span>
