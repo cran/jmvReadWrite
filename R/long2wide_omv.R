@@ -1,27 +1,48 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) from long to wide format
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+#'               any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+#'               returned instead
+#' @param varTgt Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except `varTme`,
+#'               `varID` and `varExc` are included; default: c())
+#' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
 #' @param varID  Names of one or more variables that identify the same group / individual (default: c())
 #' @param varTme Name of the variable(s) that differentiates multiple records from the same group / individual (default: c())
-#' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
-#' @param varTgt Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except varTme, varID and varExc are included; default: c())
 #' @param varSep Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1_1", "VAR1_2"; default: "_")
-#' @param varOrd How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset
-#' @param varAgg How multiple occurrences of particular combinations of time varying variables are aggregated: either "mean" (calculate the mean over occurrences), or "first" (take the first occurrence)
+#' @param varOrd How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of
+#'               the original columns in the long dataset
+#' @param varAgg How multiple occurrences of particular combinations of time varying variables are aggregated: either "mean" (calculate the mean over
+#'               occurrences), or "first" (take the first occurrence)
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
+#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+#'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
-#' @param ... Additional arguments passed on to methods; see Details below
+#' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (only returned if fleOut is empty) where the input data set is converted from long to wide format
+#' @return a data frame (only returned if `fleOut` is empty) where the input data set is converted from long to wide format
 #'
 #' @details
-#' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses `reshape`. When reading the
-#' data, the functions are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon
-#' `read.table` but with adjusted defaults for the respective file types), `readRDS` (for rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files,
-#' `read_dta` ("haven") / `read.dta` ("foreign") for Stata-files, `read_sas` ("haven") for SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you would
-#' like to use "haven", it may be needed to install it manually (i.e., `install.packages("haven", dep = TRUE)`).
+#' * If `varTgt` is empty, it is tried to generate it using all variables in the data frame except those defined by `varID`, `varTme` and `varExc`. The
+#'   variable(s) in `varID` need to be unique identifiers (in the original dataset), those in `varExc` don't have this requirement. It is generally recommended
+#'   that the variable names in `varExc` and `varID` should not contain the variable separator (defined in `varSep`; default: "_").
+#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
+#'   inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
+#'   factors).
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for transforming, reading or writing the data.
+#'   By clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
+#' * The transformation from long to wide uses `reshape`. `varTgt` matches (~) `v.names` in `reshape`, `varID` ~ `idvar`, `varTme` ~ `timevar`, and `varSep` ~
+#'   `sep`. The help for `reshape` is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.
+#' * The functions for reading and writing the data are: `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar
+#'   defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files),
+#'   `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for
+#'   Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to
+#'   use `haven`, you may need to install it using `install.packages("haven", dep = TRUE)`.
+#'
+#' @seealso `long2wide_omv` internally uses the following functions: The transformation from long to wide uses [stats::reshape()]. For reading and writing data
+#'   files in different formats: [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files,
+#'   [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or
+#'   [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{
@@ -38,10 +59,10 @@
 #' #  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...
 #' #  $ X      : num  ...
 #' # this data set is stored as (temporary) RDS-file and later processed by long2wide
-#' nmeInp <- paste0(tempfile(), ".rds")
-#' nmeOut <- paste0(tempfile(), ".omv")
+#' nmeInp <- tempfile(fileext = ".rds")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' saveRDS(dtaInp, nmeInp)
-#' long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure", varTgt = "X")
+#' long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varID = "ID", varTme = "measure")
 #' # it is required to give at least the arguments dtaInp, varID and varTme
 #' # check whether the file was created and its size
 #' cat(list.files(dirname(nmeOut), basename(nmeOut)))
@@ -79,7 +100,7 @@
 #'
 #' @export long2wide_omv
 #'
-long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c(), varExc = c(), varTgt = c(), varSep = "_", varOrd = c("times", "vars"),
+long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c(), varID = "ID", varTme = c(), varSep = "_", varOrd = c("times", "vars"),
                           varAgg = c("mean", "first"), varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # handle / check further input arguments
@@ -92,8 +113,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm, "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     # transform data set
     # [a] check whether varID, varTme and varTgt are not empty and exist in the data set
@@ -135,14 +155,11 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     # sort data set (if varSrt is not empty)
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        write_omv(dtaFrm, fleOut)
-        return(invisible(NULL))
-    } else {
-        dtaFrm
-    }
+    # if varID is unique, set it's measureType to ID
+    if (!any(duplicated(dtaFrm[[varID]]))) attr(dtaFrm[[varID]], "jmv-id") <- TRUE
+
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_wide", ...)
 }
 
 aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc = c(), varTgt = c()) {
