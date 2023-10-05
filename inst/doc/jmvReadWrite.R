@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE,
                       comment = "#>",
                       collapse = TRUE,
@@ -9,19 +9,16 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.align = "center",
                       out.width = "100%")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  install.packages("jmvReadWrite")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  if (!require(devtools)) install.packages("devtools")
 #  devtools::install_github("sjentsch/jmvReadWrite")
 
-## ---- echo=TRUE---------------------------------------------------------------
-library(jmvReadWrite)
-library(jmv)
-
+## ----echo=TRUE----------------------------------------------------------------
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV)
+data <- jmvReadWrite::read_omv(fleOMV)
 # if the "jmv"-package is installed, we can run a test analysis with the data
 if ("jmv" %in% rownames(installed.packages())) {
     jmv::ANOVA(
@@ -33,10 +30,9 @@ if ("jmv" %in% rownames(installed.packages())) {
         norm = TRUE)
     }
 
-## ---- echo=TRUE---------------------------------------------------------------
-library(jmvReadWrite)
+## ----echo=TRUE----------------------------------------------------------------
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV, getSyn = TRUE)
+data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
 # please note that syntax extraction may not work on all systems
 # if the syntax couldn't be extracted, an empty list (length = 0) is returned,
@@ -55,14 +51,12 @@ if (length(attr(data, "syntax")) >= 2) {
     }
 }
 
-## ---- echo=TRUE---------------------------------------------------------------
-library(jmvReadWrite)
-
+## ----echo=TRUE----------------------------------------------------------------
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file
 # using write_omv()
-data("ToothGrowth")
+data("ToothGrowth", package = "jmvReadWrite")
 # "retDbg" has to be set in order to return debug information to wrtDta
-wrtDta <- write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
+wrtDta <- jmvReadWrite::write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
 names(wrtDta)
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # this debug information contains a list with the metadata ("mtaDta", e.g.,
@@ -76,18 +70,18 @@ list.files(".", "Trial.omv")
 file.info("Trial.omv")
 unlink("Trial.omv")
 
-## ---- echo=TRUE---------------------------------------------------------------
+## ----echo=TRUE----------------------------------------------------------------
 # reading and writing a file with the "sveAtt"-parameter permits you to keep
 # essential meta-data to ensure that the written file looks and works like the
 # original file (plus you modifications)
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV, sveAtt = TRUE)
+data <- jmvReadWrite::read_omv(fleOMV, sveAtt = TRUE)
 # shows the names of the attributes for the whole data set (e.g., number of
 # rows and columns) and the names of the attributes of the first column
 names(attributes(data))
 names(attributes(data[[1]]))
 #
 # perhaps do some modifications to the file here and write it back afterwards
-write_omv(data, "Trial.omv")
+jmvReadWrite::write_omv(data, "Trial.omv")
 unlink("Trial.omv")
 
