@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2023-10-04" />
+<meta name="date" content="2023-11-22" />
 
 <title>R package jmvReadWrite</title>
 
@@ -356,7 +356,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2023-10-04</h4>
+<h4 class="date">2023-11-22</h4>
 
 
 
@@ -426,14 +426,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co"># if the syntax couldn&#39;t be extracted, an empty list (length = 0) is returned,</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co"># otherwise, the syntax of the analyses from the .omv-file is shown and</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="co"># the commands of the first and the second analysis are run, with the</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co"># output of the second analysis assigned to the variable result2</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co"># output of the second analysis assigned to the variable result</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="cf">if</span> (<span class="kw">length</span>(<span class="kw">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)) <span class="op">&gt;=</span><span class="st"> </span><span class="dv">2</span>) {</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>    <span class="kw">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>    <span class="co"># if the &quot;jmv&quot;-package is installed, we can run the analyses in &quot;syntax&quot;</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>    <span class="cf">if</span> (<span class="st">&quot;jmv&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())) {</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>        <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> <span class="kw">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)[[<span class="dv">1</span>]]))</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>        <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> <span class="kw">paste0</span>(<span class="st">&quot;result2 = &quot;</span>, <span class="kw">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)[[<span class="dv">2</span>]])))</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>        <span class="kw">names</span>(result2)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>        <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> <span class="kw">paste0</span>(<span class="st">&quot;result = &quot;</span>, <span class="kw">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)[[<span class="dv">2</span>]])))</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>        <span class="kw">names</span>(result)</span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>        <span class="co"># -&gt; &quot;main&quot;      &quot;assump&quot;    &quot;contrasts&quot; &quot;postHoc&quot;   &quot;emm&quot;</span></span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>        <span class="co"># (the names of the five output tables)</span></span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>    }</span>
@@ -461,9 +461,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span>
 <span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2610 FALSE  644 2023-10-04 19:10:13 2023-10-04 19:10:13</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2609 FALSE  644 2023-11-22 23:39:03 2023-11-22 23:39:03</span></span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2023-10-04 19:10:13 1000 1000 sjentsch sjentsch</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2023-11-22 23:39:03 1000 1000 sjentsch sjentsch</span></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></span>
@@ -491,13 +491,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p><code>jmvReadWrite</code> contains a number of helper functions that assist you with data management tasks that are frequently required:</p>
 <ul>
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/arrange_cols_omv.html"><code>arrange_cols_omv</code></a>: Re-arranges the columns of your data file in a requested order.</p></li>
-<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html"><code>convert_to_omv</code></a>: Converts data sets from other file formats into jamovi-format (this function may be helpful if you have to convert a larger amount of files).</p></li>
-<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/long2wide_omv.html"><code>long2wide_omv</code></a>: Convert a data set from long to wide format (time points for repeated measurements are arranged as rows in the original and converted into columns).</p></li>
-<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/wide2long_omv.html"><code>wide2long_omv</code></a>: Convert a data set from wide to long format (time points for repeated measurements are arranged as columns in the original and converted into rows).</p></li>
-<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/merge_cols_omv.html"><code>merge_cols_omv</code></a>: Add variables from several data sets (i.e., the variables / columns in the second, etc. input data set are added as columns to the first data set).</p></li>
-<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html"><code>merge_rows_omv</code></a>: Add cases from several data sets (i.e., the cases / rows in the second, etc. data set are added as rows to the first data set).</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html"><code>convert_to_omv</code></a>: Converts data sets from other file formats into jamovi-format. This function may be helpful if you have to convert a larger amount of files.</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/describe_omv.html"><code>describe_omv</code></a>: Adds a title and a description to a data set. This function may be helpful for documenting what is contained in a data set, e.g. for publishing them in a repository such as OSF, or for generated data sets, e.g. those used in teaching.</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/long2wide_omv.html"><code>long2wide_omv</code></a>: Convert a data set from long to wide format: Time points for repeated measurements are arranged as rows in the original and converted into columns.</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/wide2long_omv.html"><code>wide2long_omv</code></a>: Convert a data set from wide to long format: Time points for repeated measurements are arranged as columns in the original and converted into rows.</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/merge_cols_omv.html"><code>merge_cols_omv</code></a>: Add variables from several data sets, i.e. the variables / columns in the second, etc. input data set are added as columns to the first data set.</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html"><code>merge_rows_omv</code></a>: Add cases from several data sets, i.e. the cases / rows in the second, etc. data set are added as rows to the first data set.</p></li>
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html"><code>sort_omv</code></a>: Sort a data set according to one or more variable(s).</p></li>
-<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/transpose_omv.html"><code>transpose_omv</code></a>: Transpose a data set (make rows into columns and vice versa).</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/transpose_omv.html"><code>transpose_omv</code></a>: Transpose a data set: Make rows into columns and vice versa.</p></li>
 </ul>
 </div>
 

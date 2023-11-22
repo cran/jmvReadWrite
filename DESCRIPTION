@@ -1,6 +1,6 @@
 Package: jmvReadWrite
 Title: Read and Write 'jamovi' Files ('.omv')
-Version: 0.4.1
+Version: 0.4.2
 Author: Sebastian Jentschke [aut, cre]
     (<https://orcid.org/0000-0003-2576-5432>)
 Authors@R: 
@@ -26,6 +26,6 @@ Suggests: jmv, jmvcore (>= 2.4.7), foreign, haven, knitr, rmarkdown,
         RProtoBuf, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2023-10-04 17:10:16 UTC; sjentsch
+Packaged: 2023-11-22 22:39:08 UTC; sjentsch
 Repository: CRAN
-Date/Publication: 2023-10-05 16:30:02 UTC
+Date/Publication: 2023-11-22 23:20:02 UTC
