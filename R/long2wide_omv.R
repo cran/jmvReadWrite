@@ -113,7 +113,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
+    dtaFrm <- inp2DF(dtaInp = dtaInp, rmvEmp = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
     # transform data set
     # [a] check whether varID, varTme and varTgt are not empty and exist in the data set
@@ -125,7 +125,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
     }
     # [b] store the original variable labels, the original time-varying / target variable,
     # and an empty vector for storing labels
-    lstLbl <- list(orgLbl = sapply(dtaFrm, attr, "jmv-desc"), orgTgt = varTgt)
+    lstLbl <- list(orgLbl = lapply(dtaFrm, attr, "jmv-desc"), orgTgt = varTgt)
 
     # [c] there might be several occurrences for each combination of varID and varTme; aggregate them
     dtaFrm <- aggDta(dtaFrm = dtaFrm, varAgg = varAgg, varID = varID, varTme = varTme, varExc = varExc, varTgt = varTgt)
@@ -176,7 +176,7 @@ aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc
     } else if (varAgg == "mean")  {
         # [2] if "mean" is chosen as aggregation function, it becomes (a little) more complicated
         # [a] the target variables (for which the mean is calculated) should be numeric
-        if (!all(sapply(dtaFrm[, varTgt], is.numeric))) {
+        if (!all(vapply(dtaFrm[, varTgt], is.numeric, logical(1)))) {
             stop(paste("In order to calculate the mean when aggregating the data, all target variables (varTgt) need to be numeric. Use varAgg = \"first\" instead",
                        "(to use the first occuring value) or convert the target variables to numeric."))
         }
@@ -203,7 +203,7 @@ rstLbl <- function(dtaFrm = NULL, lstLbl = list(), varTgt = c(), varTme = c(), v
         if (crrNme %in% names(dtaFrm)) {
             attr(dtaFrm[[crrNme]], "jmv-desc") <- lstLbl$orgLbl[[crrNme]]
         } else if (crrNme %in% lstLbl$orgTgt) {
-            splTgt <- strsplit(varTgt, varSep)
+            splTgt <- strsplit(varTgt, gsub("\\.", "\\\\.", varSep))
             for (i in seq_along(splTgt)) {
                 if (crrNme %in% splTgt[[i]]) {
                     attr(dtaFrm[[varTgt[i]]], "jmv-desc") <-

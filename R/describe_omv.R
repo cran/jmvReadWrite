@@ -104,7 +104,7 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
 
     if (utils::packageVersion("jmvcore") < "2.4.3") {
         warning("jmvcore version 2.4.3 (or higher) is required for using describe_omv.\n\n")
-        return()
+        return(invisible(NULL))
     }
     if (!jmvPtB()) stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
 
@@ -203,10 +203,8 @@ splHTM <- function(vecChr = "") {
 # then split the input (into HTML tags and content) and replace characters that have a HTML-function (e.g., "/")
 # in the content
 clnHTM <- function(inpLne = c(), toHTM = FALSE) {
-    inpLne <- sapply(inpLne, function(x) {
-                                           paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x,
-                                                  ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>"))
-                                         }, USE.NAMES = FALSE)
+    inpLne <- vapply(inpLne, function(x) paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x, ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>")),
+                character(1), USE.NAMES = FALSE)
     splLne <- splHTM(paste0(inpLne, collapse = ""))
     selCnt <- !grepl("<.*?>", splLne)
     splLne[selCnt] <- rplHTM(splLne[selCnt], toHTM)
@@ -319,7 +317,7 @@ prpAtt <- function(lstAtt = NULL) {
     crrAtt <- lstAtt
     if (utils::hasName(lstAtt, "list") && identical(attr(lstAtt[["list"]], "lstEnt"), TRUE)) crrAtt[["list"]] <- NULL
     if (utils::hasName(lstAtt, "formula")) crrAtt[["formula"]] <- NULL
-    if (length(crrAtt) > 0) return(list(attributes = crrAtt)) else return(NULL)
+    if (length(crrAtt) > 0) return(list(attributes = crrAtt)) else return(invisible(NULL))
 }
 
 # add / replace HTML for title and description within index.html

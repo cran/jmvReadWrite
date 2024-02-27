@@ -117,7 +117,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     if (is.null(varID)) varID <- "ID"
-    dtaFrm <- inp2DF(dtaInp, usePkg = usePkg, selSet = selSet, ...)
+    dtaFrm <- inp2DF(dtaInp, rmvEmp = TRUE, usePkg = usePkg, selSet = selSet, ...)
     dtaNmV <- names(dtaFrm)
     hasID  <- all(varID %in% dtaNmV)
 
@@ -140,8 +140,8 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     if (varOrd) varLst <- sort(varLst)
     # use varSep to split the variable names in varLst
     if (nzchar(varSep)) {
-        varSpl <- strsplit(varLst, varSep)
-        lngSpl <- unique(unlist(lapply(varSpl, length)))
+        varSpl <- strsplit(varLst, gsub("\\.", "\\\\.", varSep))
+        lngSpl <- unique(vapply(varSpl, length, integer(1)))
         if (length(lngSpl) != 1) {
             stop(sprintf("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names:\n%s\n\n",
               paste0(varLst, collapse = ", ")))
@@ -165,7 +165,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     # (Inf is larger than any finite number and the while loop stops if there aren't any finite
     # numbers, i.e., values other than Inf or NA) left
     dffSpl <- rep(NA, lngSpl)
-    for (i in seq(lngSpl)) dffSpl[i] <- which(sapply(varSpl, "[[", i)[1] != sapply(varSpl, "[[", i)[-1])[1]
+    for (i in seq(lngSpl)) dffSpl[i] <- which(c(FALSE, !duplicated(vapply(varSpl, "[[", character(1), i))[-1]))[1]
     dffSpl[is.na(dffSpl)] <- Inf
     dffSpl[excLvl] <- Inf
     nmbTme <- sum(is.finite(dffSpl)) > 1
@@ -176,7 +176,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         # crrPos: the smallest level that is valid (i.e., that is not unique or excluded because of excLvl)
         crrPos <- which(dffSpl == min(dffSpl, na.rm = TRUE))
         # crrTms is used as parameter in crrArg and the if-condition below
-        crrTms <- unique(sapply(varSpl, "[[", crrPos))
+        crrTms <- unique(vapply(varSpl, "[[", character(1), crrPos))
         # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
         # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
         # target as name and all former variables for that step of the hierarchy as entries
@@ -191,10 +191,10 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
             }
         }
         # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
-        # rplAtt also corrects labels (if available) and variable names
+        # rmvTms also corrects labels (if available) and variable names
         crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry, v.names = names(crrVry),
                        timevar = paste0(varTme, rep(sum(is.finite(dffSpl)), nmbTme)), times = crrTms)
-        dtaFrm <- rplAtt(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
+        dtaFrm <- rmvTms(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
                                                         c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))), crrTms)
         dtaFrm[[crrArg$timevar]] <- as.factor(dtaFrm[[crrArg$timevar]])
         varID  <- c(varID, crrArg$timevar)
@@ -245,8 +245,8 @@ rmvID <- function(dtaFrm = NULL, varID = c(), hasID = TRUE) {
     dtaFrm
 }
 
-rplAtt <- function(dtaFrm = NULL, crrTms = c()) {
-    varNme <-      attr(dtaFrm, "reshapeLong")$v.names
+rmvTms <- function(dtaFrm = NULL, crrTms = c()) {
+    varNme <- attr(dtaFrm, "reshapeLong")$v.names
     for (crrNme in varNme) {
         attr(dtaFrm[[crrNme]], "name") <- crrNme
         crrDsc <- c(attr(dtaFrm[, crrNme], "jmv-desc"), attr(dtaFrm[, crrNme], "description"))[1]
