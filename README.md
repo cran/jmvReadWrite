@@ -15,7 +15,6 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
-[![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last
 commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=GitHub)](https://github.com/sjentsch/jmvReadWrite)
 [![Register an
@@ -188,6 +187,9 @@ data("ToothGrowth", package = "jmvReadWrite")
 wrtDta <- jmvReadWrite::write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
 names(wrtDta)
 #> [1] "mtaDta" "xtdDta" "dtaFrm"
+```
+
+``` r
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # this debug information contains a list with the metadata ("mtaDta", e.g.,
 # column and data type), the extended data ("xtdDta", e.g., variable lables),
@@ -198,11 +200,17 @@ names(wrtDta)
 # and delete the file afterwards
 list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
+```
+
+``` r
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2610 FALSE  644 2024-04-04 12:20:09 2024-04-04 12:20:09
+#> Trial.omv 2610 FALSE  644 2024-05-22 21:54:08 2024-05-22 21:54:08
 #>                         atime   uid  gid  uname grname
-#> Trial.omv 2024-04-04 12:20:09 87448 4601 sje025 ansatt
+#> Trial.omv 2024-05-22 21:54:08 87448 4601 sje025 ansatt
+```
+
+``` r
 unlink("Trial.omv")
 ```
 
@@ -225,12 +233,18 @@ data <- jmvReadWrite::read_omv(fleOMV, sveAtt = TRUE)
 names(attributes(data))
 #> [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"
 #> [6] "addedRows"   "transforms"
+```
+
+``` r
 names(attributes(data[[1]]))
 #>  [1] "name"           "id"             "columnType"     "dataType"      
 #>  [5] "measureType"    "formula"        "formulaMessage" "parentId"      
 #>  [9] "width"          "type"           "importName"     "description"   
 #> [13] "transform"      "edits"          "missingValues"  "filterNo"      
 #> [17] "active"
+```
+
+``` r
 #
 # perhaps do some modifications to the file here and write it back afterwards
 jmvReadWrite::write_omv(data, "Trial.omv")
