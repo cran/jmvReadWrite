@@ -19,10 +19,10 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=GitHub)](https://github.com/sjentsch/jmvReadWrite)
 [![Register an
 issue](https://img.shields.io/github/issues/sjentsch/jmvReadWrite?color=%23fa251e&logo=GitHub)](https://github.com/sjentsch/jmvReadWrite/issues)
-[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
+[![R-hub](https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml)
 [![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
+[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml)
 [![pkgcheck](https://github.com/sjentsch/jmvReadWrite/workflows/pkgcheck/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck)
-[![code-coverage](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml)
 [![Codecov
 coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite/)
@@ -187,9 +187,6 @@ data("ToothGrowth", package = "jmvReadWrite")
 wrtDta <- jmvReadWrite::write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
 names(wrtDta)
 #> [1] "mtaDta" "xtdDta" "dtaFrm"
-```
-
-``` r
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # this debug information contains a list with the metadata ("mtaDta", e.g.,
 # column and data type), the extended data ("xtdDta", e.g., variable lables),
@@ -200,17 +197,11 @@ names(wrtDta)
 # and delete the file afterwards
 list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
-```
-
-``` r
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2610 FALSE  644 2024-05-22 21:54:08 2024-05-22 21:54:08
+#> Trial.omv 2610 FALSE  644 2024-07-09 15:15:05 2024-07-09 15:15:05
 #>                         atime   uid  gid  uname grname
-#> Trial.omv 2024-05-22 21:54:08 87448 4601 sje025 ansatt
-```
-
-``` r
+#> Trial.omv 2024-07-09 15:15:05 87448 4601 sje025 ansatt
 unlink("Trial.omv")
 ```
 
@@ -233,18 +224,12 @@ data <- jmvReadWrite::read_omv(fleOMV, sveAtt = TRUE)
 names(attributes(data))
 #> [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"
 #> [6] "addedRows"   "transforms"
-```
-
-``` r
 names(attributes(data[[1]]))
 #>  [1] "name"           "id"             "columnType"     "dataType"      
 #>  [5] "measureType"    "formula"        "formulaMessage" "parentId"      
 #>  [9] "width"          "type"           "importName"     "description"   
 #> [13] "transform"      "edits"          "missingValues"  "filterNo"      
 #> [17] "active"
-```
-
-``` r
 #
 # perhaps do some modifications to the file here and write it back afterwards
 jmvReadWrite::write_omv(data, "Trial.omv")

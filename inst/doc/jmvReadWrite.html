@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2024-05-22" />
+<meta name="date" content="2024-07-09" />
 
 <title>R package jmvReadWrite</title>
 
@@ -356,7 +356,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2024-05-22</h4>
+<h4 class="date">2024-07-09</h4>
 
 
 
@@ -448,44 +448,44 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co"># &quot;retDbg&quot; has to be set in order to return debug information to wrtDta</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>wrtDta &lt;-<span class="st"> </span>jmvReadWrite<span class="op">::</span><span class="kw">write_omv</span>(ToothGrowth, <span class="st">&quot;Trial.omv&quot;</span>, <span class="dt">retDbg =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="kw">names</span>(wrtDta)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;mtaDta&quot; &quot;xtdDta&quot; &quot;dtaFrm&quot;</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># -&gt; &quot;mtaDta&quot; &quot;xtdDta&quot; &quot;dtaFrm&quot;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co"># this debug information contains a list with the metadata (&quot;mtaDta&quot;, e.g.,</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co"># column and data type), the extended data (&quot;xtdDta&quot;, e.g., variable lables),</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co"># and the data frame (dtaFrm) for checking (understanding the file format) and</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co"># debugging</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co"># check whether the file was written to the disk, get the file information (size, etc.)</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="co"># and delete the file afterwards</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="kw">list.files</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;Trial.omv&quot;</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2610 FALSE  644 2024-05-22 22:20:18 2024-05-22 22:20:18</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="co">#&gt;                         atime   uid  gid  uname grname</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2024-05-22 22:20:18 87448 4601 sje025 ansatt</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span></code></pre></div>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;mtaDta&quot; &quot;xtdDta&quot; &quot;dtaFrm&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co"># -&gt; &quot;mtaDta&quot; &quot;xtdDta&quot; &quot;dtaFrm&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="co"># this debug information contains a list with the metadata (&quot;mtaDta&quot;, e.g.,</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="co"># column and data type), the extended data (&quot;xtdDta&quot;, e.g., variable lables),</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="co"># and the data frame (dtaFrm) for checking (understanding the file format) and</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a><span class="co"># debugging</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="co"># check whether the file was written to the disk, get the file information (size, etc.)</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="co"># and delete the file afterwards</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a><span class="kw">list.files</span>(<span class="st">&quot;.&quot;</span>, <span class="st">&quot;Trial.omv&quot;</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="kw">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2610 FALSE  644 2024-07-09 16:37:55 2024-07-09 16:37:55</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a><span class="co">#&gt;                         atime   uid  gid  uname grname</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co">#&gt; Trial.omv 2024-07-09 16:37:55 87448 4601 sje025 ansatt</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co"># essential meta-data to ensure that the written file looks and works like the</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co"># original file (plus you modifications)</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>fleOMV &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;ToothGrowth.omv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;jmvReadWrite&quot;</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>data &lt;-<span class="st"> </span>jmvReadWrite<span class="op">::</span><span class="kw">read_omv</span>(fleOMV, <span class="dt">sveAtt =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="co"># shows the names of the attributes for the whole data set (e.g., number of</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="co"># rows and columns) and the names of the attributes of the first column</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="kw">names</span>(<span class="kw">attributes</span>(data))</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;names&quot;       &quot;row.names&quot;   &quot;class&quot;       &quot;fltLst&quot;      &quot;removedRows&quot;</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a><span class="co">#&gt; [6] &quot;addedRows&quot;   &quot;transforms&quot;</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">names</span>(<span class="kw">attributes</span>(data[[<span class="dv">1</span>]]))</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;name&quot;           &quot;id&quot;             &quot;columnType&quot;     &quot;dataType&quot;      </span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="co">#&gt;  [5] &quot;measureType&quot;    &quot;formula&quot;        &quot;formulaMessage&quot; &quot;parentId&quot;      </span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="co">#&gt;  [9] &quot;width&quot;          &quot;type&quot;           &quot;importName&quot;     &quot;description&quot;   </span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="co">#&gt; [13] &quot;transform&quot;      &quot;edits&quot;          &quot;missingValues&quot;  &quot;filterNo&quot;      </span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="co">#&gt; [17] &quot;active&quot;</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="co">#</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="co"># perhaps do some modifications to the file here and write it back afterwards</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>jmvReadWrite<span class="op">::</span><span class="kw">write_omv</span>(data, <span class="st">&quot;Trial.omv&quot;</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># reading and writing a file with the &quot;sveAtt&quot;-parameter permits you to keep</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co"># essential meta-data to ensure that the written file looks and works like the</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co"># original file (plus you modifications)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>fleOMV &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;ToothGrowth.omv&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;jmvReadWrite&quot;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>data &lt;-<span class="st"> </span>jmvReadWrite<span class="op">::</span><span class="kw">read_omv</span>(fleOMV, <span class="dt">sveAtt =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co"># shows the names of the attributes for the whole data set (e.g., number of</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co"># rows and columns) and the names of the attributes of the first column</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="kw">names</span>(<span class="kw">attributes</span>(data))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;names&quot;       &quot;row.names&quot;   &quot;class&quot;       &quot;fltLst&quot;      &quot;removedRows&quot;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="co">#&gt; [6] &quot;addedRows&quot;   &quot;transforms&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="kw">names</span>(<span class="kw">attributes</span>(data[[<span class="dv">1</span>]]))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;name&quot;           &quot;id&quot;             &quot;columnType&quot;     &quot;dataType&quot;      </span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a><span class="co">#&gt;  [5] &quot;measureType&quot;    &quot;formula&quot;        &quot;formulaMessage&quot; &quot;parentId&quot;      </span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="co">#&gt;  [9] &quot;width&quot;          &quot;type&quot;           &quot;importName&quot;     &quot;description&quot;   </span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a><span class="co">#&gt; [13] &quot;transform&quot;      &quot;edits&quot;          &quot;missingValues&quot;  &quot;filterNo&quot;      </span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a><span class="co">#&gt; [17] &quot;active&quot;</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="co">#</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a><span class="co"># perhaps do some modifications to the file here and write it back afterwards</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>jmvReadWrite<span class="op">::</span><span class="kw">write_omv</span>(data, <span class="st">&quot;Trial.omv&quot;</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a><span class="kw">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span></code></pre></div>
 <p>If <code>Trial.omv</code> in the example above would have been kept, it should look like the original file (plus your possible modifications). If you, e.g., added a new column, you could adjust some attributes (e.g., to enforce a specific <code>columnType</code> or <code>measurementType</code>): just look at how attributes are stored for other columns. <br /><br /></p>
 <p><strong>Helper functions</strong></p>
 <p><code>jmvReadWrite</code> contains a number of helper functions that assist you with data management tasks that are frequently required:</p>
