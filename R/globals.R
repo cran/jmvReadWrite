@@ -307,6 +307,12 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
     outObj
 }
 
+rmvMsV <- function(dtaFrm = NULL) {
+    for (N in names(dtaFrm))
+        attr(dtaFrm[, N], "missingValues") <- NULL
+    return(dtaFrm)
+}
+
 rmvAtt <- function(attObj = NULL) {
     for (crrAtt in setdiff(names(attributes(attObj)), c("class", "comment", "dim", "jmv-id", "jmv-desc", "levels", "names", "row.names", "values"))) {
         attr(attObj, crrAtt) <- NULL
@@ -398,6 +404,24 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvA
 }
 
 # =================================================================================================
+# convert matrix from full to sparse - used for proximities_omv and distances_omv
+mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxXps = FALSE, mtxSps = FALSE) {
+    if (diff(dim(dtaFrm)) == 0) rownames(dtaFrm) <- names(dtaFrm)
+    if (!isSymmetric(as.matrix(dtaFrm))) stop("Input matrix needs to be symmetric.")
+
+    C <- ncol(dtaFrm)
+    if (rmvTrU || mtxSps) dtaFrm[upper.tri(dtaFrm)] <- NA
+    if (rmvDgn || mtxSps) diag(dtaFrm) <- NA
+    if (mtxXps) dtaFrm <- as.data.frame(t(dtaFrm))
+    if (mtxSps) dtaFrm <- cbind(data.frame(Variable = names(dtaFrm)[seq(1, C)[ifelse(mtxXps, -C, -1)]]),
+                                dtaFrm[seq(1, C)[ifelse(mtxXps, -C, -1)], seq(1, C)[ifelse(mtxXps, -1, -C)]])
+    for (crrClm in names(dtaFrm))
+        attr(dtaFrm[, crrClm], "measureType") <- ifelse(crrClm == "Variable", "Nominal", "Continuous")
+
+    return(dtaFrm)
+}
+
+# =================================================================================================
 # function for copying analyses from one data file to another
 
 xfrAnl <- function(fleOrg = "", fleTgt = "") {
@@ -444,40 +468,6 @@ getOS <- function() {
 
 isJmv <- function() {
     nzchar(Sys.getenv("JAMOVI_R_VERSION"))
-}
-
-jmvAtt <- function(dtaFrm = NULL) {
-    chkDtF(dtaFrm)
-
-    for (crrNme in names(dtaFrm)) {
-         # if the attributes already exist, go to the next column
-         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "dataType")) next
-         # jmv-id
-         if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "ID"
-             attr(dtaFrm[[crrNme]], "dataType")     <- ifelse(is.integer(dtaFrm[[crrNme]]), "Integer", "Text")
-         } else if (is.integer(dtaFrm[[crrNme]])) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.numeric(dtaFrm[[crrNme]])) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Decimal"
-         } else if (is.factor(dtaFrm[[crrNme]])) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- ifelse(is.ordered(dtaFrm[[crrNme]]), "Ordinal", "Nominal")
-             attr(dtaFrm[[crrNme]], "dataType")     <- ifelse(is.null(attr(dtaFrm[[crrNme]], "values")), "Text", "Integer")
-         } else if (is.logical(dtaFrm[[crrNme]]) || is.character(dtaFrm[[crrNme]])) {
-             crrAtt <- attributes(dtaFrm[[crrNme]])
-             dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])
-             dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
-             if (length(dffAtt) > 0) dtaFrm[crrNme] <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = dtaFrm[crrNme])
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else {
-             stop(sprintf("\n\n%s: Variable type %s not implemented:\n%s\n\n", crrNme, class(dtaFrm[[crrNme]]), trimws(utils::capture.output(utils::str(dtaFrm[[crrNme]])))))
-         }
-    }
-
-    dtaFrm
 }
 
 jmvOpn <- function(dtaFrm = NULL, dtaTtl = "") {

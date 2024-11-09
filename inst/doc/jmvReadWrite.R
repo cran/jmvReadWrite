@@ -10,11 +10,11 @@ knitr::opts_chunk$set(echo = TRUE,
                       out.width = "100%")
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  install.packages("jmvReadWrite")
+# install.packages("jmvReadWrite")
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  if (!require(devtools)) install.packages("devtools")
-#  devtools::install_github("sjentsch/jmvReadWrite")
+# if (!require(devtools)) install.packages("devtools")
+# devtools::install_github("sjentsch/jmvReadWrite")
 
 ## ----echo=TRUE----------------------------------------------------------------
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
