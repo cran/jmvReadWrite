@@ -187,7 +187,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     }
 
     # convert to matrix, and transpose if necessary ===============================================
-    if (clmDst) dtaMtx <- as.matrix(dtaFrm) else dtaMtx <- t(as.matrix(dtaFrm))
+    if (clmDst) dtaMtx <- as.matrix(dtaFrm[, varDst]) else dtaMtx <- t(as.matrix(dtaFrm[, varDst]))
 
     # standardize the data ========================================================================
     if        (grepl("^none$",             stdDst)) {
@@ -220,9 +220,9 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     } else if (grepl("^chebychev$",         nmeDst)) {
         dstMtx <- as.matrix(stats::dist(t(dtaMtx), "maximum",   TRUE, TRUE))
     } else if (grepl("^minkowski_\\d+$",    nmeDst)) {
-        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getP(nmeDst)))
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getPw(nmeDst)))
     } else if (grepl("^power_\\d+_\\d+$",   nmeDst)) {
-        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getP(nmeDst)) ^ (getP(nmeDst) / getR(nmeDst)))
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getPw(nmeDst)) ^ (getPw(nmeDst) / getRt(nmeDst)))
     } else if (grepl("^cosine$",            nmeDst)) {
         dstMtx <- clcCos(dtaMtx)
     } else if (grepl("^correlation$",       nmeDst)) {
@@ -231,8 +231,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     } else if (grepl("^chisq$|^ph2$",       nmeDst)) {
         dstMtx <- clcFrq(dtaMtx, nmeDst)
     # (3) binary data -----------------------------------------------------------------------------
-    } else if (grepl(paste0("^beuclid|^blwmn|^bseuclid|^bshape|^d$|^d_|^dice|^disper|^hamann|^jaccard|^k[1-2]$|^k[1-2]_|",
-                            "^lambda|^ochiai|^pattern|^phi|^q$|^q_|^rr|^rt|^size|^ss[1-5]|^sm|^y$|^y_|^variance"), nmeDst)) {
+    } else if (binDst(nmeDst)) {
         dstMtx <- clcBin(dtaMtx, nmeDst)
     # (4) none ------------------------------------------------------------------------------------
     } else if (grepl("^none$",              nmeDst)) {
@@ -251,6 +250,12 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
 }
 
 # helper and calculation functions ================================================================
+# binary measures: check whether name is valid
+binDst <- function(nmeDst = "") {
+    grepl(paste0("^beuclid$|^blwmn$|^bseuclid$|^bshape$|^d$|^dice$|^disper$|^hamann$|^jaccard$|^jaccard[s,d]$|^k[1-2]$|^lambda$|",
+                 "^ochiai$|^pattern$|^phi$|^q$|^rr$|^rt$|^size$|^sm$|^ss[1-5]$|^variance$|^y$"), gsub("_\\w+_\\w+$", "", nmeDst))
+}
+
 # binary measures: calculation, calls mtcBin for each cell (variable pair comparison / matches)
 clcBin <- function(m = NULL, t = "jaccard") {
     # transform data matrix into a logical matrix
@@ -258,13 +263,14 @@ clcBin <- function(m = NULL, t = "jaccard") {
     # extract transformation name
     t <- strsplit(t, "_")[[1]][1]
     n <- ncol(m)
-    # create a result matrix (first determine what goes into the main diagonal)
-    d <- ifelse(grepl("^d$|^disper$|^k1$|^rr$|^ss3$", t), NA,
-           ifelse(grepl("^beuclid$|^blwmn$|^bseuclid$|^bshape$|^jaccardd$|^pattern$|^size$|^variance$", t), 0, 1))
-    r <- matrix(d, n, n, dimnames = rep(dimnames(m)[2], 2))
+    # create a result matrix
+    r <- matrix(NA, n, n, dimnames = rep(dimnames(m)[2], 2))
 
-    for (i in seq(ifelse(grepl("^rr$|^d$|^disper$", t), 1, 2), n)) {
-        for (j in seq(1, i - ifelse(grepl("^rr$|^d$|^disper$", t), 0, 1))) {
+    for (i in seq(1, n)) {
+        for (j in seq(1, i)) {
+            # skip calculation of distance in the main diagonal for k1 and ss3
+            # (keep NA; if calculated, the limitation to 9999.999 [l. 366 / 392] would hit)
+            if (i == j && grepl("^k1$|^ss3$", t)) next
             r[i, j] <- r[j, i] <- mtcBin(m[, i], m[, j], t)
         }
     }
@@ -308,20 +314,26 @@ clcFrq <- function(m = NULL, t = "chisq") {
 }
 
 # helper functions: get P (power / present), NP (not present), and R (root)
-getP <-          function(s) c(as.numeric(stats::na.omit(strsplit(s, "_")[[1]][2])), 1)[1]
-getR <- getNP <- function(s) c(as.numeric(stats::na.omit(strsplit(s, "_")[[1]][3])), 0)[1]
+getP  <- function(s) stats::na.omit(c(strsplit(s, "_")[[1]][2], "1"))[1]
+getNP <- function(s) stats::na.omit(c(strsplit(s, "_")[[1]][3], "0"))[1]
+getPw <- function(s) as.numeric(strsplit(s, "_")[[1]][2])
+getRt <- function(s) as.numeric(strsplit(s, "_")[[1]][3])
 
 # binary measures: transform the data matrix from numeric into logical
 mkeBin <- function(m = NULL, p = 1, np = 0) {
     if (all(apply(m, 2, is.logical))) return(m)
 
-    if (all(apply(m, 2, is.numeric))) {
-        r <- matrix(as.logical(m * NA), nrow = nrow(m), dimnames = dimnames(m))
-        r[m ==  p] <- TRUE
-        r[m == np] <- FALSE
+    if        (all(apply(m, 2, function(c) is.numeric(c)   &&   all(as.numeric(c(p, np)) %in% unique(c))))) {
+        r <- matrix(as.logical(NA), nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
+        r[m == as.numeric(p)]  <- TRUE
+        r[m == as.numeric(np)] <- FALSE
+    } else if (all(apply(m, 2, function(c) is.character(c) && all(as.character(c(p, np)) %in% unique(c))))) {
+        r <- matrix(as.logical(NA), nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
+        r[m == as.character(p)]  <- TRUE
+        r[m == as.character(np)] <- FALSE
     } else {
         stop(paste("The input matrix for binary data either needs to be logical (then it will be kept as it is),",
-                   "or numeric (where p and np are used to derive TRUE and FALSE)."))
+                   "numeric or character (for the latter two, p and np are used to derive TRUE and FALSE)."))
     }
 
     r
