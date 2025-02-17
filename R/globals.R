@@ -9,11 +9,6 @@ if (getRversion() >= "2.15.1") {
 }
 
 # =================================================================================================
-# define characters from latin1 (after enc2utf8) and their respective replacements
-lstRpl <- rbind(c("<84>",   "<93>",   "<c4>",   "<d6>",   "<dc>",   "<df>",   "<e4>",   "<f6>",   "<fc>"),
-                c("\u0084", "\u0093", "\u00c4", "\u00d6", "\u00dc", "\u00df", "\u00e4", "\u00f6", "\u00fc"))
-
-# =================================================================================================
 # the next lines store the currently supported versions (stored in meta / MANIFEST.MF)
 # and the string that precedes the version number
 lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
@@ -35,8 +30,8 @@ grpMta <- paste0("^", paste(c(names(mtaGlb), names(mtaFld)), collapse = "$|^"), 
 # functions for checking parameters (file and directory existence, correct file extension, correct
 # dimensions and existence of data frames) and normalizing the file name
 
-#            jamovi  CSV   TSV     Rdata           RDS   SPSS           Stata  SAS
-vldExt <- c("omv",  "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc")
+#            jamovi        CSV    TSV    Rdata           RDS    SPSS           Stata  SAS
+vldExt <- c("omv", "omt", "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc")
 
 # REMEMBER: requires the full file name, NOT the directory
 chkDir <- function(fleNme = "", wrtPrm = TRUE) {
@@ -49,7 +44,7 @@ chkDir <- function(fleNme = "", wrtPrm = TRUE) {
     TRUE
 }
 
-chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
+chkDtF <- function(dtaFrm = NULL, minSze = c(0, 1)) {
     if (length(minSze) != 2) minSze <- rep(minSze[1], 2)
     if (is.null(dtaFrm) || !is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
         stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.")
@@ -61,8 +56,9 @@ chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
 }
 
 chkExt <- function(fleNme = "", extNme = c("")) {
-    if (! hasExt(fleNme, extNme)) {
-        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")))
+    if (!hasExt(fleNme, extNme)) {
+        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme),
+          paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")))
     }
     TRUE
 }
@@ -78,7 +74,7 @@ chkFle <- function(fleNme = "", isZIP = FALSE, fleCnt = "") {
         hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character")
         close(tmpHdl)
         # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
-        if (! hdrStr == "PK\003\004\024") {
+        if (hdrStr != "PK\003\004\024" && hdrStr != "PK\003\004") {
             stop(sprintf("chkFle: File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)))
         }
     }
@@ -124,9 +120,9 @@ fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
 }
 
 fmtFlO <- function(fleOut = "") {
-    if (!nzchar(fleOut) || (nzchar(fleOut) && !hasExt(fleOut, "omv"))) {
+    if (!nzchar(fleOut) || !hasExt(fleOut, c("omv", "omt"))) {
         clsRmv()
-        stop("fleOut needs to be a valid non-empty file name (character), and the file extension for output file needs to be .omv.")
+        stop("fleOut needs to be a valid non-empty file name (character), and the file extension for output file needs to be .omv or .omt.")
     }
     nrmFle(fleOut)
 }
@@ -144,6 +140,58 @@ clsRmv <- function() {
 
     return(TRUE)
 }
+
+# =================================================================================================
+# convert columns to another class (e.g., integer to factor) preserving attributes, check whether
+# a column contains / can be converted into integers, and convert undefined characters into UTF-8
+
+cnvCol <- function(crrCol = NULL, tgtTyp = "character") {
+    if (methods::is(crrCol, tgtTyp)) return(crrCol)
+
+    # store attributes
+    crrAtt <- attributes(crrCol)
+    dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
+    # pre-processing (convert date, trim spaces and round where necessary)
+    if (methods::is(crrCol, "POSIXct")) crrCol <- as.Date(crrCol)
+    if (is.character(crrCol)) crrCol <- trimws(crrCol)
+    if (is.numeric(crrCol) && tgtTyp ==  "integer") crrCol <- round(crrCol)
+    # actual conversion; jamovi stores factors differently depending on whether they have the dataType Integer or Text
+    if (is.factor(crrCol) && tgtTyp == "integer") {
+        crrCol <- if (intFnC(crrCol)) as.integer(as.character(crrCol)) else as.integer(crrCol) - 1L
+    } else if (tgtTyp == "factor") {
+        # tibble: conversion if the source is a column with the type dbl+lbl
+        if ("labels" %in% names(crrAtt)) {
+            crrCol <- factor(crrCol, levels = unname(crrAtt$labels), labels = names(crrAtt$labels))
+            dffAtt <- setdiff(dffAtt, "labels")
+        # foreign: conversion if the source is a column that has the attribute "value.labels"
+        } else if ("value.labels" %in% names(crrAtt)) {
+            crrCol <- factor(crrCol, levels = unname(crrAtt[["value.labels"]]), labels = cnvUTF(names(crrAtt[["value.labels"]])))
+            dffAtt <- setdiff(dffAtt, "value.labels")
+        # “usual” columns (without specified attributes)
+        } else {
+            crrCol <- as.factor(crrCol)
+        }
+    } else {
+        crrCol <- methods::as(crrCol, tgtTyp)
+    }
+    if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
+
+    crrCol
+}
+
+intFnC <- function(crrCol = NULL) {
+    facLvl <- if (is.factor(crrCol)) levels(crrCol) else unique(trimws(crrCol))
+
+    all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl)
+}
+
+cnvUTF <- function(inpStr = c()) {
+    # assign "latin1" to those entries that have special characters (e.g., ä, æ, ß, etc.)
+    Encoding(inpStr) == "latin1"
+    # return a trimmed version of the input vector that is converted into UTF-8
+    trimws(enc2utf8(inpStr))
+}
+
 
 # =================================================================================================
 # initializing and handling ProtoBuffers
@@ -316,16 +364,27 @@ rmvMsV <- function(dtaFrm = NULL) {
     return(dtaFrm)
 }
 
-rmvAtt <- function(attObj = NULL) {
-    for (crrAtt in setdiff(names(attributes(attObj)), c("class", "comment", "dim", "jmv-id", "jmv-desc", "levels", "names", "row.names", "values"))) {
+rmvAtt <- function(attObj = NULL, att2Rm = NULL) {
+    if (is.null(att2Rm))
+        att2Rm <- setdiff(names(attributes(attObj)), c("class", "comment", "dim", "jmv-id", "jmv-desc", "levels", "names", "row.names", "values"))
+    for (crrAtt in att2Rm) {
         attr(attObj, crrAtt) <- NULL
     }
 
     attObj
 }
 
+rstAtt <- function(attObj = NULL, att2Rs = c()) {
+    for (crrAtt in att2Rs) {
+        if (crrAtt %in% names(attributes(attObj))) attr(attObj, crrAtt) <- methods::as(c(), class(attr(attObj, crrAtt)))
+    }
+
+    attObj
+}
+
 chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {
-   ((attNme %in% names(attributes(attObj))) && length(attr(attObj, attNme)) > 0 && ifelse(!is.null(attVal), grepl(attVal, attr(attObj, attNme)), TRUE))
+   ((attNme %in% names(attributes(attObj))) && length(attr(attObj, attNme)) > 0 &&
+     ifelse(!is.null(attVal), grepl(attVal, attr(attObj, attNme)), TRUE))
 }
 
 chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
@@ -429,8 +488,7 @@ mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxXps = FALSE
 
 xfrAnl <- function(fleOrg = "", fleTgt = "") {
     # check whether input and output files are valid and format input and output file names
-    chkExt(fleOrg, "omv") && chkFle(fleOrg, isZIP = TRUE) && chkFle(fleOrg, fleCnt = "meta|MANIFEST.MF")
-    chkExt(fleTgt, "omv") && chkFle(fleTgt, isZIP = TRUE) && chkFle(fleTgt, fleCnt = "meta|MANIFEST.MF")
+    chkExt(fleOrg, c("omv", "omt")) && chkFle(fleOrg, isZIP = TRUE) && chkFle(fleOrg, fleCnt = "meta|MANIFEST.MF")
     fleOrg <- fmtFlI(fleOrg, maxLng = 1)
     fleTgt <- fmtFlI(fleTgt, maxLng = 1)
 

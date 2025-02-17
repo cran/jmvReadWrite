@@ -38,7 +38,9 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).")
 
     # check and format input file names - do not use chkExt here
-    if (tolower(tools::file_ext(fleInp)) != "omv") stop("read_omv only reads jamovi files (.omv), use convert_to_omv first, if you want to read other files types.")
+    if (!hasExt(fleInp, c("omv", "omt"))) {
+        stop("read_omv only reads jamovi files (.omv / .omt), use convert_to_omv first, if you want to read other files types.")
+    }
     fleInp <- fmtFlI(fleInp, maxLng = 1)
     fleLst <- zip::zip_list(fleInp)$filename
     # check whether the file list contains either the file "meta" (newer jamovi file format) or MANIFEST.MF (older format)
@@ -85,13 +87,15 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         } else if (chkFld(mtaCol, "type", "string"))  {
             crrCol <- vector("character", length = rowNum)
             crrIdx <- readBin(binHdl, integer(), n = rowNum)
-            for (j in seq(rowNum)) {
-                if (is.na(crrIdx[j])) next
-                if (crrIdx[j] == strPos) {
-                    crrCol[j] <- readBin(strHdl, "character", n = 1)
-                    strPos <- strPos + length(charToRaw(crrCol[j])) + 1
-                } else {
-                    stop("Mismatch between the assumed and the actual position in the file when reading string variables.")
+            if (rowNum > 0) {
+                for (j in seq(rowNum)) {
+                    if (is.na(crrIdx[j])) next
+                    if (crrIdx[j] == strPos) {
+                        crrCol[j] <- readBin(strHdl, "character", n = 1)
+                        strPos <- strPos + length(charToRaw(crrCol[j])) + 1
+                    } else {
+                        stop("Mismatch between the assumed and the actual position in the file when reading string variables.")
+                    }
                 }
             }
             rm(crrIdx)
@@ -153,6 +157,12 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     # as data frame dimensions, the latter stored in the variables / columns)
     if (sveAtt) {
         dtaFrm <- setAtt(setdiff(names(mtaGlb), c("rowCount", "columnCount", "fields")), mtaDta, dtaFrm)
+    }
+
+    # reset some attributes ("addedRows" [for the data.frame] and "edits" for each column) for jamovi templates (.omt)
+    if (hasExt(fleInp, "omt")) {
+        dtaFrm <- rstAtt(dtaFrm, "addedRows")
+        for (crrNme in names(dtaFrm)) dtaFrm[[crrNme]] <- rstAtt(dtaFrm[[crrNme]], "edits")
     }
 
     # handle weights
@@ -232,18 +242,21 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
     usePkg <- match.arg(usePkg)
     dtaFrm <- NULL
 
-    # OMV
-    if        (hasExt(fleInp, c("omv"))) {
+    # OMV / OMT
+    if        (hasExt(fleInp, c("omv", "omt"))) {
         dtaFrm <- tryCatch(do.call(read_omv, adjArg("read_omv", list(fleInp = fleInp), varArg, "fleInp")),
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+                           error   = function(errMsg) tryErr(fleInp, errMsg),
+                           warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
     # CSV
     } else if (hasExt(fleInp, c("csv"))) {
         dtaFrm <- tryCatch(rmvQtn(do.call(utils::read.table, adjArg("read.table", list(file = fleInp, sep = ",",  quote = "\"", header = TRUE, fill = TRUE), varArg, "file"))),
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+                           error   = function(errMsg) tryErr(fleInp, errMsg),
+                           warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
     # TSV
     } else if (hasExt(fleInp, c("tsv"))) {
         dtaFrm <- tryCatch(rmvQtn(do.call(utils::read.table, adjArg("read.table", list(file = fleInp, sep = "\t", quote = "\"", header = TRUE, fill = TRUE), varArg, "file"))),
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+                           error   = function(errMsg) tryErr(fleInp, errMsg),
+                           warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
     # Rdata
     } else if (hasExt(fleInp, c("rdata", "rda"))) {
         dtaFrm <- tryCatch({
@@ -251,11 +264,17 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
                              if (length(rdaTmp) != 1 && selSet == "") stop("The Rdata-file must include only one object.")
                              rdaTmp[[ifelse(selSet == "", names(rdaTmp)[1], selSet)]]
                            },
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+                           error   = function(errMsg) tryErr(fleInp, errMsg),
+                           warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+        if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, function(C) methods::is(C, "haven_labelled"), logical(1))))
+            dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
     # RDS
     } else if (hasExt(fleInp, c("rds"))) {
         dtaFrm <- tryCatch(do.call(readRDS, adjArg("readRDS", list(file = fleInp), varArg, "file")),
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+                           error   = function(errMsg) tryErr(fleInp, errMsg),
+                           warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+        if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, function(C) methods::is(C, "haven_labelled"), logical(1))))
+            dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
     # SPSS (haven / foreign)
     } else if (hasExt(fleInp, c("sav", "zsav"))) {
         dtaFrm <-  getSPSS(fleInp, usePkg, varArg)
@@ -268,10 +287,7 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
     }
 
     # check whether the input data are a data frame with the correct dimensions
-    chkDtF(dtaFrm)
-
-    # check whether all attributes conform with unicode and do some cleaning if required
-    dtaFrm <- rplAtt(dtaFrm)
+    if (!is.null(dtaFrm)) chkDtF(dtaFrm)
 
     dtaFrm
 }
@@ -321,15 +337,60 @@ clsHdl <- function(crrHdl = NULL) {
     rm(crrFle, crrHdl)
 }
 
-fgnLbl <- function(dtaFrm = NULL) {
-    if (!is.null(attr(dtaFrm, "variable.labels"))) {
-        varLbl <- trimws(attr(dtaFrm, "variable.labels"))
-        for (crrCol in names(dtaFrm)) {
-            if (crrCol %in% names(varLbl) && varLbl[[crrCol]] != "") {
-                attr(dtaFrm[[crrCol]], "jmv-desc") <- varLbl[[crrCol]]
+clnFgn <- function(dtaFrm = NULL) {
+    if (is.null(dtaFrm)) return(dtaFrm)
+    chkDtF(dtaFrm)
+
+    if (chkAtt(dtaFrm, "variable.labels")) {
+        varLbl <- attr(dtaFrm, "variable.labels")
+        Encoding(varLbl) <- "latin1"
+        for (crrNme in names(dtaFrm)) {
+            if (crrNme %in% names(varLbl) && varLbl[[crrNme]] != "") {
+                attr(dtaFrm[[crrNme]], "jmv-desc") <- cnvUTF(varLbl[[crrNme]])
             }
         }
         attr(dtaFrm, "variable.labels") <- NULL
+    }
+
+    dtaFrm
+}
+
+clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
+    if (is.null(dtaFrm)) return(dtaFrm)
+
+    # convert tibble to data.frame (remove tbl_df, tbl from class)
+    class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl", rmvAtt))
+    chkDtF(dtaFrm)
+
+    for (crrNme in names(dtaFrm)) {
+        # convert haven_labelled to factors
+        if (methods::is(dtaFrm[[crrNme]], "haven_labelled")) {
+            tmpLbl <- gsub("value label", "", names(attr(dtaFrm[[crrNme]], "labels")))
+            if (all(nzchar(tmpLbl))) {
+                dtaFrm[[crrNme]] <- cnvCol(dtaFrm[[crrNme]], "factor")
+            } else if (!any(nzchar(tmpLbl))) {
+                class(dtaFrm[[crrNme]]) <- setdiff(class(dtaFrm[[crrNme]]), c("haven_labelled", "vctrs_vctr"))
+                attr(dtaFrm[[crrNme]], "labels") <- NULL
+                if (is.numeric(dtaFrm[[crrNme]]) && all(dtaFrm[[crrNme]] %% 1 == 0, na.rm = TRUE))
+                    class(dtaFrm[[crrNme]]) <- gsub("numeric", "integer", class(dtaFrm[[crrNme]]))
+            } else {
+                tmpLbl[!nzchar(tmpLbl)] <- sprintf("%d", which(!nzchar(tmpLbl)))
+                names(attr(dtaFrm[[crrNme]], "labels")) <- tmpLbl
+                dtaFrm[[crrNme]] <- cnvCol(dtaFrm[[crrNme]], "factor")
+            }
+        }
+        # remove attributes given in rmvAtt
+        for (crrAtt in rmvAtt) {
+            if (! is.null(attr(dtaFrm[[crrNme]], crrAtt))) {
+                attr(dtaFrm[[crrNme]], crrAtt) <- NULL
+            }
+        }
+        # convert label to jamovi label
+        if (jmvLbl && !is.null(attr(dtaFrm[[crrNme]], "label"))) {
+            if (nzchar(gsub("variable label", "", attr(dtaFrm[[crrNme]], "label"))))
+                attr(dtaFrm[[crrNme]], "jmv-desc") <- attr(dtaFrm[[crrNme]], "label")
+            attr(dtaFrm[[crrNme]], "label") <- NULL
+        }
     }
 
     dtaFrm
@@ -352,7 +413,8 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
                  file(file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrFle))), crrMde)
              },
              error = function(errMsg) {
-                 message(sprintf("The file \"%s\" could not be extracted from \"%s\".\nPlease send the file to sebastian.jentschke@uib.no!\nError message: %s\n", crrFle, fleOMV, errMsg))
+                 message(sprintf("The file \"%s\" could not be extracted from \"%s\".\nPlease send the file to sebastian.jentschke@uib.no!\nError message: %s\n",
+                           crrFle, fleOMV, errMsg))
                  return(invisible(NULL))
              }
         )
@@ -361,67 +423,64 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
 getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
     # SAS data (haven)
     if (hasExt(fleInp, c("sas7bdat", "sd2", "sd7"))) {
-        tryCatch({
-                     if        (usePkg == "haven"   && hasPkg("haven"))   {
-                         hvnTmp <- haven::as_factor(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")), only_labelled = TRUE)
-                         hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
-                     } else {
-                         stop(sprintf("In order to read the SAS-file \"%s\" the R-packages \"haven\" needs to be installed.", basename(fleInp)))
-                     }
-                 },
-                 error   = function(errMsg) tryErr(fleInp, errMsg),
-                 warning = function(wrnMsg) tryWrn(fleInp, wrnMsg)
-        )
+        if        (usePkg == "haven"   && hasPkg("haven"))   {
+            hvnTmp <- tryCatch(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")),
+                               error   = function(errMsg) tryErr(fleInp, errMsg),
+                               warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
+            if (is.null(hvnTmp)) return(hvnTmp)
+            clnTbb(hvnTmp, c("format.sas", "display_width"), jmvLbl = TRUE)
+        } else {
+            stop(sprintf("In order to read the SAS-file \"%s\" the R-packages \"haven\" needs to be installed.", basename(fleInp)))
+        }
     # SAS-transport-files (haven / foreign)
     } else if (hasExt(fleInp, c("xpt", "stx", "stc"))) {
-        tryCatch({
-                     if        (usePkg == "haven"   && hasPkg("haven"))   {
-                         hvnTmp <- haven::as_factor(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                         hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
-                     } else if (usePkg == "foreign" && hasPkg("foreign")) {
-                         fgnLbl(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, c("file"))))
-                     } else {
-                         stop(sprintf("In order to read the SAS-transport-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
-                     }
-                 },
-                 error   = function(errMsg) tryErr(fleInp, errMsg),
-                 warning = function(wrnMsg) tryWrn(fleInp, wrnMsg)
-        )
+        if        (usePkg == "haven"   && hasPkg("haven"))   {
+            hvnTmp <- tryCatch(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")),
+                               error   = function(errMsg) tryErr(fleInp, errMsg),
+                               warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
+            clnTbb(hvnTmp, c("format.sas", "display_width"), jmvLbl = TRUE)
+        } else if (usePkg == "foreign" && hasPkg("foreign")) {
+            fgnTmp <- tryCatch(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, c("file"))),
+                               error   = function(errMsg) tryErr(fleInp, errMsg))
+            clnFgn(fgnTmp)
+        } else {
+            stop(sprintf("In order to read the SAS-transport-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
+        }
     }
 }
 
 getSPSS  <- function(fleInp = "", usePkg = "", varArg = list()) {
-    tryCatch({
-                 if        (usePkg == "haven"   && hasPkg("haven"))   {
-                     hvnTmp <- haven::as_factor(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                     hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"), jmvLbl = TRUE)
-                 } else if (usePkg == "foreign" && hasPkg("foreign")) {
-                     fgnLbl(do.call(foreign::read.spss, adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE), varArg, c("file", "to.data.frame"))))
-                 } else {
-                     stop(sprintf("In order to read the SPSS-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
-                 }
-             },
-             error   = function(errMsg) tryErr(fleInp, errMsg),
-             warning = function(wrnMsg) tryWrn(fleInp, wrnMsg)
-    )
+    if        (usePkg == "haven"   && hasPkg("haven"))   {
+        hvnTmp <- tryCatch(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")),
+                           error   = function(errMsg) tryErr(fleInp, errMsg),
+                           warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
+        clnTbb(hvnTmp, c("format.spss", "display_width"), jmvLbl = TRUE)
+    } else if (usePkg == "foreign" && hasPkg("foreign")) {
+        fgnTmp <- tryCatch(suppressWarnings(do.call(foreign::read.spss,
+                             adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE, trim_values = TRUE, trim.factor.names = TRUE),
+                               varArg, c("file", "to.data.frame", "trim_values", "trim.factor.names")))),
+                           error   = function(errMsg) tryErr(fleInp, errMsg))
+        clnFgn(fgnTmp)
+    } else {
+        stop(sprintf("In order to read the SPSS-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
+    }
 }
 
 getStata  <- function(fleInp = "", usePkg = "", varArg = list()) {
     # NB: more recent versions of the Stata-format require "haven" and can't be read with foreign
-    tryCatch({
-                 usePkg <- ifelse(grepl("^<stata_dta><header>", readBin(fleInp, character(), n = 1)), "haven", usePkg)
-                 if        (usePkg == "haven"   && hasPkg("haven"))   {
-                      hvnTmp <- haven::as_factor(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                      hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
-                 } else if (usePkg == "foreign" && hasPkg("foreign")) {
-                      fgnLbl(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, c("file"))))
-                 } else {
-                      stop(sprintf("In order to read the Stata-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
-                 }
-             },
-             error   = function(errMsg) tryErr(fleInp, errMsg),
-             warning = function(wrnMsg) tryWrn(fleInp, wrnMsg)
-    )
+    usePkg <- ifelse(grepl("^<stata_dta><header>", readBin(fleInp, character(), n = 1)), "haven", usePkg)
+    if        (usePkg == "haven"   && hasPkg("haven"))   {
+        hvnTmp <- tryCatch(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")),
+                           error   = function(errMsg) tryErr(fleInp, errMsg),
+                           warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
+        clnTbb(hvnTmp, c("format.stata", "display_width"), jmvLbl = TRUE)
+    } else if (usePkg == "foreign" && hasPkg("foreign")) {
+        tmpFgn <- tryCatch(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, c("file"))),
+                           error = function(errMsg) tryErr(fleInp, errMsg))
+        clnFgn(tmpFgn)
+    } else {
+        stop(sprintf("In order to read the Stata-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
+    }
 }
 
 getTxt <- function(fleOMV = "", crrFle = "") {
@@ -437,74 +496,12 @@ getTxt <- function(fleOMV = "", crrFle = "") {
     crrTxt
 }
 
-hvnAdj <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
-   for (crrCol in names(dtaFrm)) {
-       for (crrAtt in rmvAtt) {
-             if (! is.null(attr(dtaFrm[[crrCol]], crrAtt))) {
-                 attr(dtaFrm[[crrCol]], crrAtt) <- NULL
-             }
-        }
-        if (jmvLbl && !is.null(attr(dtaFrm[[crrCol]], "label"))) {
-            attr(dtaFrm[[crrCol]], "jmv-desc") <- attr(dtaFrm[[crrCol]], "label")
-            attr(dtaFrm[[crrCol]], "label")    <- NULL
-        }
-    }
-
-    dtaFrm
-}
-
 rmvQtn <- function(dtaFrm = NULL) {
-    for (crrCol in names(which(vapply(dtaFrm, is.character, logical(1))))) {
-        dtaFrm[[crrCol]] <- trimws(gsub("\"", "", dtaFrm[[crrCol]]))
+    for (crrNme in names(which(vapply(dtaFrm, is.character, logical(1))))) {
+        dtaFrm[[crrNme]] <- trimws(gsub("\"", "", dtaFrm[[crrNme]]))
     }
 
     dtaFrm
-}
-
-rplAtt <- function(dtaFrm = NULL) {
-    # extract the attributes from the dataset and its columns and determine which attributes are
-    # character
-    dfAtt  <- setdiff(names(attributes(dtaFrm))[vapply(attributes(dtaFrm), is.character, logical(1))], c("names", "row.names", "class", "HTML"))
-    colAtt <- setdiff(unique(unlist(lapply(lapply(dtaFrm, attributes), names), use.names = FALSE)), c("class"))
-
-    # go through the data frame attributes (except the attributes from R) and check their validity
-    for (crrAtt in dfAtt) {
-        attr(dtaFrm, crrAtt) <- rplStr(attr(dtaFrm, crrAtt), crrAtt)
-    }
-    # changing column attributes puts class in the last place within the attributes, this is reversed underneath
-    dfOrd <- names(attributes(dtaFrm))
-
-    # go through the column attributes (except the attributes from R) and the detect columns
-    # where those attributes are not validly encoded
-    for (crrAtt in colAtt) {
-        lstAtt <- lapply(dtaFrm, attr, crrAtt)
-        lstAtt <- lstAtt[!vapply(lstAtt, is.null, logical(1))]
-        if (!any(vapply(lstAtt, is.character, logical(1)))) next
-#       for (crrCol in names(lstAtt)[vapply(lstAtt, function(x) !all(validEnc(x)), logical(1))]) {
-        for (crrCol in names(lstAtt)) {
-            attr(dtaFrm[[crrCol]], crrAtt) <- rplStr(attr(dtaFrm[[crrCol]], crrAtt), paste0(c(crrCol, crrAtt), collapse = " - "))
-        }
-    }
-    # re-establish the correct order of the data frame attributes
-    attributes(dtaFrm) <- attributes(dtaFrm)[dfOrd]
-
-    dtaFrm
-}
-
-rplStr <- function(strMod = "", crrAtt = "") {
-    # encode as UTF-8 (to enforce valid encoding)
-    strMod <- enc2utf8(strMod)
-    if (any(grepl("<[0-9,a-f][0-9,a-f]>", strMod))) {
-        # lstRpl is defined in globals.R
-        for (i in seq_len(dim(lstRpl)[2])) {
-            strMod <- gsub(lstRpl[1, i], lstRpl[2, i], strMod)
-        }
-        if (any(grepl("<[0-9,a-f][0-9,a-f]>", strMod))) {
-            stop(sprintf("The current data set still contains an invalid character (\"%s\") in attribute: \"%s\".", strMod, crrAtt))
-        }
-    }
-
-    strMod
 }
 
 tryErr <- function(fleInp = "", errMsg = NULL) {

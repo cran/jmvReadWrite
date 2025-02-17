@@ -1,3 +1,15 @@
+# jmvReadWrite 0.4.10
+
+## Enhancements:
+* permitting to read and write jamovi templates (`.omt`; incl. unit tests)
+* reorganizing and cleaning the code (particularly in `read_all`)
+* improvement in `read_all` when reading files (improved exception handling, etc.)
+* renamed `hvnAdj` to `clnTbb` and improved it (better “cleaning” of data read via `haven`)
+* renamed `fgnLbl` to `clnFgn` (including improvements to convert variable labels into their jamovi equivalents)
+* reducing cyclomatic complexity
+
+---
+
 # jmvReadWrite 0.4.9
 
 ## Enhancements:
