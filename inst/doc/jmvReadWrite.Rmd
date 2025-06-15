@@ -74,7 +74,7 @@ The results should be identical apart from that the table output looks nicer in
 other cosmetic differences.
 
 If you want to copy the syntax generated in jamovi, you have to switch on the
-[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_jamovi_and_R.html#syntax-mode).
+[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_jamovi_and_R/#syntax-mode).
 Afterwards, the syntax is shown at the top of the analysis and can be copied
 from there.
 
@@ -150,7 +150,7 @@ names(wrtDta)
 # check whether the file was written to the disk, get the file information (size, etc.)
 # and delete the file afterwards
 list.files(".", "Trial.omv")
-file.info("Trial.omv")
+file.info("Trial.omv")[, c("size", "isdir", "mode")]
 unlink("Trial.omv")
 ```
 
@@ -192,6 +192,12 @@ management tasks that are frequently required:
 
 * [`arrange_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/arrange_cols_omv.html):
   Re-arranges the columns of your data file in a requested order.
+
+* [`combine_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/combine_cols_omv.html):
+  Combines the data from two columns into one. The function assumes that the data contained in
+  the two columns are the same. It checks for (and thereby ensures) equality and replaces missing
+  values in one column by replacing those with values from the second column (if those are not
+  missing as well).
 
 * [`convert_to_omv`](https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html):
   Converts data sets from other file formats into jamovi-format. This function

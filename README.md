@@ -83,7 +83,7 @@ differences.
 
 If you want to copy the syntax generated in jamovi, you have to switch
 on the
-[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_jamovi_and_R.html#syntax-mode).
+[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_jamovi_and_R/#syntax-mode).
 Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.
 
@@ -196,11 +196,9 @@ names(wrtDta)
 # and delete the file afterwards
 list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
-file.info("Trial.omv")
-#>           size isdir mode               mtime               ctime
-#> Trial.omv 2617 FALSE  644 2025-02-17 00:38:11 2025-02-17 00:38:11
-#>                         atime   uid  gid  uname grname
-#> Trial.omv 2025-02-17 00:38:11 87448 4601 sje025 ansatt
+file.info("Trial.omv")[, c("size", "isdir", "mode")]
+#>           size isdir mode
+#> Trial.omv 2617 FALSE  644
 unlink("Trial.omv")
 ```
 
@@ -248,6 +246,13 @@ with data management tasks that are frequently required:
 
 - [`arrange_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/arrange_cols_omv.html):
   Re-arranges the columns of your data file in a requested order.
+
+- [`combine_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/combine_cols_omv.html):
+  Combines the data from two columns into one. The function assumes that
+  the data contained in the two columns are the same. It checks for (and
+  thereby ensures) equality and replaces missing values in one column by
+  replacing those with values from the second column (if those are not
+  missing as well).
 
 - [`convert_to_omv`](https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html):
   Converts data sets from other file formats into jamovi-format. This
