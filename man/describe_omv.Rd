@@ -34,7 +34,7 @@ base R), but "haven" is newer and more comprehensive}
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a data frame (only returned if \code{fleOut} is empty) where the order of variables / columns of the input data set is re-arranged
+a data frame (only returned if \code{fleOut} is empty) where a description and a title are added to the input data
 }
 \description{
 Adds a title and a description for a data set stored as .omv-file for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
@@ -64,7 +64,6 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 }
 \examples{
-\dontrun{
 dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
 nmeOut <- tempfile(fileext = ".omv")
 
@@ -107,7 +106,7 @@ chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bol
 jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
   dtaDsc = chrDsc)
 unlink(nmeOut)
-}
+
 
 }
 \seealso{

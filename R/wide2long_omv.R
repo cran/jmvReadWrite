@@ -8,13 +8,10 @@
 #' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
 #' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers
 #'               identifying cases; default: NULL)
-#' @param varTme Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added
-#'               for each time-varying part)
+#' @param varTme Name of the variable (or vector with variable names) that (is created to) differentiate multiple records from the same group / individual #'               (default: "cond"; if required, a counter is added for each time-varying part)
 #' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("_" in
 #'               "VAR_1", "VAR_2", default: "_")
-
 #' @param varOrd Whether to arrange the variables before the transformation, so that they are in accordance with the different split levels (default: TRUE)
-
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
 #' @param excLvl Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details
 #'               below
@@ -111,8 +108,9 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = NULL, varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(),
-                          excLvl = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
+wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = NULL,
+                          varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(), excLvl = NULL,
+                          usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -124,15 +122,18 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     # check whether varLst is empty; if so, all variables except the one given as varID are used as varLst
     # otherwise, check whether the variables in varLst are contained in the data frame
     if (is.null(varLst)) {
-        cat(paste0("Variable list (varLst) was generated using all variables in the data frame", ifelse(hasID || (!is.null(varExc) && all(nzchar(varExc))),
-                  sprintf(" except those defined in varExc or varID (%s).", paste(c(varExc, rep(varID, hasID)), collapse = ", ")), "."), "\n"))
+        cat(paste0("Variable list (varLst) was generated using all variables in the data frame",
+                   ifelse(hasID || (!is.null(varExc) && all(nzchar(varExc))),
+                   sprintf(" except those defined in varExc or varID (%s).",
+                           paste(c(varExc, rep(varID, hasID)), collapse = ", ")), "."), "\n"))
         varLst <- setdiff(dtaNmV, c(varExc, varID))
     } else {
         chkVar(dtaFrm, varLst)
     }
     # check whether they all contain the separator
     if (nzchar(varSep) && !all(grepl(varSep, varLst, fixed = TRUE))) {
-        stop(sprintf("\n\nThe variable separator (varSep, \"%s\") must be contained in all variables in the variable list (varLst).\nDeviating variables: %s\n",
+        stop(sprintf(paste("\n\nThe variable separator (varSep, \"%s\") must be contained in all variables",
+                           "in the variable list (varLst).\nDeviating variables: %s\n"),
                      varSep, paste(varLst[!grepl(varSep, varLst, fixed = TRUE)], collapse = ", ")))
     }
     # re-arrange the variable in the variable list so that they are in accordance with the order
@@ -143,8 +144,9 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         varSpl <- strsplit(varLst, gsub("\\.", "\\\\.", varSep))
         lngSpl <- unique(vapply(varSpl, length, integer(1)))
         if (length(lngSpl) != 1) {
-            stop(sprintf("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names:\n%s\n\n",
-              paste0(varLst, collapse = ", ")))
+            stop(sprintf(paste("The variable names in varLst need to have the same structure, i.e., the",
+                               "same number of separators within all variable names:\n%s\n\n"),
+                         paste0(varLst, collapse = ", ")))
         }
     } else {
         varSpl <- as.list(varLst)
@@ -168,7 +170,8 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     for (i in seq(lngSpl)) dffSpl[i] <- which(c(FALSE, !duplicated(vapply(varSpl, "[[", character(1), i))[-1]))[1]
     dffSpl[is.na(dffSpl)] <- Inf
     dffSpl[excLvl] <- Inf
-    nmbTme <- sum(is.finite(dffSpl)) > 1
+    numSpl <- sum(is.finite(dffSpl)) > 1
+    pfxTme <- ifelse(length(varTme) > 1, "cond", varTme)
 
     # carry out the transformation
     crrNmV <- varLst
@@ -177,23 +180,11 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         crrPos <- which(dffSpl == min(dffSpl, na.rm = TRUE))
         # crrTms is used as parameter in crrArg and the if-condition below
         crrTms <- unique(vapply(varSpl, "[[", character(1), crrPos))
-        # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
-        # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
-        # target as name and all former variables for that step of the hierarchy as entries
-        if (all(crrNmV %in% crrTms)) {
-            crrVry <- list(measure = crrNmV)
-        } else {
-            vldPos <- which(!is.na(dffSpl))
-            crrVry <- list()
-            for (i in seq_along(varSpl)) {
-                tmpTgt <- paste0(varSpl[[i]][setdiff(vldPos, crrPos)], collapse = varSep)
-                crrVry[[tmpTgt]] <- unique(c(crrVry[[tmpTgt]], paste0(varSpl[[i]][vldPos], collapse = varSep)))
-            }
-        }
-        # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
-        # rmvTms also corrects labels (if available) and variable names
-        crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry, v.names = names(crrVry),
-                       timevar = paste0(varTme, rep(sum(is.finite(dffSpl)), nmbTme)), times = crrTms)
+        # assemble the list for varying
+        crrVry <- crtVry(crrNmV = crrNmV, crrTms = crrTms, varSpl = varSpl, vldPos = which(!is.na(dffSpl)), crrPos = crrPos, varSep = varSep)
+        crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry,
+                       v.names = names(crrVry), timevar = paste0(pfxTme, rep(sum(is.finite(dffSpl)), numSpl)),
+                       times = crrTms)
         dtaFrm <- rmvTms(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
                                                         c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))), crrTms)
         dtaFrm[[crrArg$timevar]] <- as.factor(dtaFrm[[crrArg$timevar]])
@@ -201,14 +192,27 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         crrNmV <- names(crrVry)
         dffSpl[crrPos] <- NA
     }
-    # remove attributes from reshape attached to the data set
+    # remove attributes from reshape attached to the data set, and row.names
     attr(dtaFrm, "reshapeLong") <- NULL
+    row.names(dtaFrm) <- NULL
 
-    # sort data set (if varSrt is not empty, otherwise sort after the first variable in varID (defining the participant)
-    dtaFrm <- srtFrm(dtaFrm, c(rep(varSrt, length(varSrt) > 0), rep(varID[1], length(varSrt) >= 0)))
     # correct the column order (ID should come first, otherwise the order is kept with the transformed variables inserted into
     # were the respective original (i.e., before the transformation) variables were
     dtaFrm <- dtaFrm[, ordCol(names(dtaFrm), dtaNmV, varID, varLst)]
+
+    # if varTme was a variable vector, assign the names in it to the columns beginning with the time prefix
+    if (length(varTme) > 1) {
+        selClm <- grepl(paste0("^", pfxTme), names(dtaFrm))
+        if (sum(selClm) == length(varTme)) {
+            names(dtaFrm)[selClm] <- varTme
+#           varID[grepl(paste0("^", pfxTme), varID)] <- varTme
+        } else {
+            warning("The number of splits (defined by the variables in varLst and varSep) is not matching the length of varTme.")
+        }
+    }
+
+    # sort data set (if varSrt is not empty, otherwise sort after the first variable in varID (defining the participant)
+    dtaFrm <- srtFrm(dtaFrm, c(rep(varSrt, length(varSrt) > 0), rep(varID[1], length(varSrt) >= 0)))
 
     # remove the jmv-id, and change the measurement type to "Nominal" (if it was ID; -> the ID variable may be used
     # in analyses, e.g. as random-effects-variable, and this wouldn't be possible if it were still marked as "ID")
@@ -218,13 +222,33 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_long"), ...)
 }
 
+crtVry <- function(crrNmV = c(), crrTms = c(), varSpl = c(), vldPos = NA, crrPos = NA, varSep = "_") {
+    # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
+    # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
+    # target as name and all former variables for that step of the hierarchy as entries
+    # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
+    # rmvTms also corrects labels (if available) and variable names
+
+    if (all(crrNmV %in% crrTms)) {
+        list(measure = crrNmV)
+    } else {
+        crrVry <- list()
+        for (i in seq_along(varSpl)) {
+            tmpTgt <- paste0(varSpl[[i]][setdiff(vldPos, crrPos)], collapse = varSep)
+            crrVry[[tmpTgt]] <- unique(c(crrVry[[tmpTgt]], paste0(varSpl[[i]][vldPos], collapse = varSep)))
+        }
+        crrVry
+    }
+}
+
 ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {
     posVrL <- range(which(dtaNmV %in% varLst))
     varOrd <- c(varID[1], setdiff(dtaNmV[rep(seq(1, posVrL[1] - 1), posVrL[1] > 1)], varID), sort(varID[-1]),
                 setdiff(varNme, c(varID, setdiff(dtaNmV, varLst))),
                 setdiff(dtaNmV[rep(seq(posVrL[2] + 1, length(dtaNmV)), posVrL[2] < length(dtaNmV))], varID))
     if (length(c(setdiff(varNme, varOrd), setdiff(varOrd, varNme))) != 0) {
-        stop(paste0("Mismatch between old and new variable order - old: ", paste0(varNme, collapse = ", "), "; new: ", paste0(varOrd, collapse = ", "), "."))
+        stop(sprintf("Mismatch between old and new variable order - old: (%s); new: (%s).",
+                     paste0(varNme, collapse = ", "), paste0(varOrd, collapse = ", ")))
     }
 
     varOrd
@@ -249,7 +273,8 @@ rmvTms <- function(dtaFrm = NULL, crrTms = c()) {
         if (is.null(crrDsc) || !nzchar(crrDsc)) next
         splDsc <- trimws(strsplit(crrDsc, "\\(|\\)")[[1]])
         if (length(splDsc) == 2) {
-            rplDsc <- paste0(trimws(strsplit(splDsc[2], ",")[[1]])[!grepl(paste(paste0("\\w+: ", crrTms, "$"), collapse = "|"), trimws(strsplit(splDsc[2], ",")[[1]]))], collapse = ", ")
+            rplDsc <- paste0(trimws(strsplit(splDsc[2], ",")[[1]])[!grepl(paste(paste0("\\w+: ", crrTms, "$"), collapse = "|"),
+                             trimws(strsplit(splDsc[2], ",")[[1]]))], collapse = ", ")
             attr(dtaFrm[[crrNme]], "jmv-desc")    <- ifelse(nzchar(rplDsc), paste0(splDsc[1], " (", rplDsc, ")"), splDsc[1])
             attr(dtaFrm[[crrNme]], "description") <- ifelse(nzchar(rplDsc), paste0(splDsc[1], " (", rplDsc, ")"), splDsc[1])
         }
