@@ -198,7 +198,7 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")[, c("size", "isdir", "mode")]
 #>           size isdir mode
-#> Trial.omv 2617 FALSE  644
+#> Trial.omv 2618 FALSE  644
 unlink("Trial.omv")
 ```
 
@@ -275,6 +275,12 @@ with data management tasks that are frequently required:
   calculation of the distances should be carried out between columns /
   variables or between rows / units of observation. The original data
   can be standardized before the distances are calculated.
+
+- [`label_vars_omv`](https://sjentsch.github.io/jmvReadWrite/reference/label_vars_omv.html):
+  Labels columns / variables in jamovi data files, using either a CSV
+  file, a data frame (each containing two columns, one with the variable
+  names, the other with the variable labels), or a character vector with
+  the variable labels.
 
 - [`long2wide_omv`](https://sjentsch.github.io/jmvReadWrite/reference/long2wide_omv.html):
   Converts a data set from long to wide format: Time points for repeated

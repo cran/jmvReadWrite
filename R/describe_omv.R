@@ -7,6 +7,8 @@
 #' @param dtaTtl Character vector with a title to be added to the data set (see Details; default: "")
 #' @param dtaDsc Description of the data set, either as character vector (HTML-formatted) or as named list with the entries "description", "variables",
 #'               "references", and "license" (see Details; default: "")
+#' @param lngDsc Language of the description (localizes the description components: "Description", "Variables", "References", and "License";
+#'               default: "EN")
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 #'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
@@ -16,20 +18,20 @@
 #'
 #' @details
 #' * The aim of this function is to add a title and a data set description to jamovi data files. Two typical use cases would be (1) to help creating data sets
-#'   to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide ”properly
-#'   described“ data when publishing in a repository such as the OSF).
+#'   to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide "properly
+#'   described" data when publishing in a repository such as the OSF).
 #' * NB: The data set should not contain any existing analyses. These will be overwritten (a  warning is issued informing you about that).
-#' * `dtaTtl` is a title for the dataset (at the top of the results output, i.e., that title which initially is “Results” when you create a new data set in
+#' * `dtaTtl` is a title for the dataset (at the top of the results output, i.e., that title which initially is "Results" when you create a new data set in
 #'   jamovi).
 #' * `dtaDsc` can either be a character vector (with length = 1) containing HTML-formatted text that describes the data set (see `chrDsc` in the examples for
-#'   HTML tags that are currently implemented; putting “unformatted” text is not a problem, but then the result is just plain text without formatting).
+#'   HTML tags that are currently implemented; putting "unformatted" text is not a problem, but then the result is just plain text without formatting).
 #'   Alternatively, `dtaDcs` can be a named list with the entries `description`, `variables`, `references`, `license`. All entries except from `variables`
 #'   contain character vectors (length = 1); `variables` shall be a named list with the variable name as name and a description what the variable contains as
 #'   entry. `description` and `variables` must be given, `references` and `license` can be left blank (""; but the names must be present in the list). An
 #'   example for both a named list with a description (`lstDsc`), as well as a character vector with all HTML tags that are implemented (`chrDsc`) can be found
 #'   in the examples below.
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
-#'   on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+#'   on the respective function under "See also", you can get a more detailed overview over which parameters each of those functions take. The functions are:
 #'   `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV
 #'   which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
 #'   (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files,
@@ -66,12 +68,11 @@
 #'
 #' # the code underneath should cover all formatting options jamovi is able to use (paste0 is only
 #' # for readability)
-#' chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bold</strong><br/>",
+#' chrDsc <- paste0("<p><strong>Trial - all formattings:</strong><br/><strong>bold</strong><br/>",
 #'                  "<strong><em>bold, italics</em></strong><br/><em>italics</em><br/><u>underlined",
-#'                  "</u><br/>link:<a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\">https://",
-#'                  "jamovi.org﻿﻿﻿</a><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>",
-#'                  "OH<br/>R<sup>2</sup><br/><span style=\"background-color:#e60000\">background ",
-#'                  "colour: red</span><br/><span style=\"color:#e60000\">foreground color: red",
+#'                  "</u><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>OH<br/>R<sup>2",
+#'                  "</sup><br/><span style=\"background-color:#e60000\">background colour: red",
+#'                  "</span><br/><span style=\"color:#e60000\">foreground color: red",
 #'                  "</span></p><p class=\"ql-align-center\">centered</p><p class=\"ql-align-right\">",
 #'                  "right</p><p class=\"ql-align-justify\">justify justify justify justify justify ",
 #'                  "justify justify justify justify justify justify justify justify justify justify ",
@@ -88,7 +89,7 @@
 #'
 #' @export describe_omv
 #'
-describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(), lngDsc = "EN", usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check the input parameters: either dtaTtl or dtaDsc need to be given (and in the correct format)
     dscPrm(dtaTtl, dtaDsc)
@@ -101,11 +102,22 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
         warning("jmvcore version 2.4.3 (or higher) is required for using describe_omv.\n\n")
         return(invisible(NULL))
     }
-    if (!jmvPtB()) stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
+    if (!jmvPtB())
+        stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
 
-    # check whether dtaDsc is a list, and if so, convert it to a HTML desription
+    # check whether dtaDsc is a list, and if so, convert it to a HTML desription;
+    # in addition: add a description if there doesn't exist one already
     if (is.list(dtaDsc)) {
-        dtaDsc <- crtHTM(dtaDsc)
+        if (length(setdiff(names(dtaDsc[["variables"]]), names(dtaFrm))) != 0 ||
+            length(setdiff(names(dtaFrm), names(dtaDsc[["variables"]]))) != 0)
+            stop("The variable description (in dtaDsc) should contain all variables in the data set and no variables not contained in it.")
+        for (crrClm in names(dtaDsc[["variables"]])) {
+            if (!any(c("jmv-desc", "description") %in% names(attributes(dtaFrm[, crrClm])))) {
+                attr(dtaFrm[, crrClm], "jmv-desc")    <- dtaDsc[["variables"]][[crrClm]]
+                attr(dtaFrm[, crrClm], "description") <- dtaDsc[["variables"]][[crrClm]]
+            }
+        }
+        dtaDsc <- crtHTM(dtaDsc, defHdr(lngDsc))
     }
 
     # check whether the data set contains analyses and, if so warn that they will be overwritten
@@ -171,22 +183,145 @@ clnHTM <- function(inpLne = c(), toHTM = FALSE) {
 }
 
 # create HTML from the list-version of dtaDsc
-crtHTM <- function(inpDsc = NULL) {
+crtHTM <- function(inpDsc = NULL, nmeHdr = NULL) {
     outDsc <- c()
-    outDsc <- paste0(outDsc, "<p><strong>Description:</strong></p>", clnHTM(inpDsc[["description"]]))
-    outDsc <- paste0(outDsc, "<p><br/><strong>Variables:</strong></p><ul>")
+    outDsc <- paste0(outDsc,      "<p><strong>", nmeHdr["description"], ":</strong></p>", clnHTM(inpDsc[["description"]]))
+    outDsc <- paste0(outDsc, "<p><br/><strong>", nmeHdr["variables"],   ":</strong></p><ul>")
     for (varNme in names(inpDsc[["variables"]])) {
          outDsc <- paste0(outDsc, clnHTM(paste0("<li><strong><em>", varNme, ":</em></strong> ", inpDsc[["variables"]][[varNme]], "</li>")))
     }
     outDsc <- paste0(outDsc, "</ul>")
     if (length(inpDsc[["references"]]) > 0 && all(nzchar(inpDsc[["references"]]))) {
-        outDsc <- paste0(outDsc, "<p><br/><strong>References:</strong></p>", clnHTM(inpDsc[["references"]]))
+        outDsc <- paste0(outDsc, "<p><br/><strong>", nmeHdr["references"], ":</strong></p>", clnHTM(inpDsc[["references"]]))
     }
     if (length(inpDsc[["license"]]) > 0    && all(nzchar(inpDsc[["license"]]))) {
         outDsc <- paste0(outDsc, "<p><br/>", clnHTM(paste0("<em>", inpDsc[["license"]], "</em>")))
     }
 
     return(outDsc)
+}
+
+# define headers for crtHTM (in different languages)
+defHdr <- function(crrLng = "EN") {
+    if        (crrLng == "DE") {
+        c(description = "Beschreibung", variables = "Variablen", references = "Referenzen")
+    } else if (crrLng == "JP") {
+#       NB: UTF-characters must be converted using stringi::stri_escape_unicode()
+        c(description = "\u8aac\u660e", variables = "\u5909\u6570", references = "\u5f15\u7528\u6587\u732e")
+    } else if (crrLng == "NB") {
+        c(description = "Beskrivelse", variables = "Variabler", references = "Referanser")
+    } else {  # defaults to English
+        c(description = "Description", variables = "Variables", references = "References")
+    }
+}
+
+# define some common licenses and make them translateable
+defLic <- function(licNme = "", crrLng = "EN", licHld = "") {
+    if        (licNme == "CC0") {
+        if        (crrLng == "DE") {
+            paste("Dieser Datensatz ist uneingeschr\u00e4nkt zug\u00e4nglich, und der Autor hat auf alle seine Rechte an dem",
+                  "Werk verzichtet. Sie k\u00f6nnen den Datensatz daher ohne vorherige Genehmigung kopieren, ver\u00e4ndern,",
+                  "und verbreiten, auch f\u00fcr kommerzielle Zwecke. Wenn der Datensatz auf empirischen Daten basiert,",
+                  "sind die Autoren im Abschnitt 'Referenzen' des Datensatzes angegeben. Zitieren Sie in diesem Fall",
+                  "bitte die entsprechenden Referenzen, wenn Sie den Datensatz verwenden.")
+        } else if (crrLng == "EN") {
+            paste("This data set is in the public domain, and the author has waived all of his or her rights to the",
+                  "work. You can therefore copy, modify and distribute the data set, even for commercial purposes,",
+                  "all without asking permission. If the data set is based upon empirical work, the authors are",
+                  "given in the 'References'-section of the data set. In such case, please cite the respective",
+                  "reference(s) when using the dataset.")
+        } else if (crrLng == "JP") {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        } else if (crrLng == "NB") {
+            paste("Datasettet er offentlig tilgjengelig, og forfatteren har fraskrevet seg alle rettigheter til",
+                  "datasettet. Du kan derfor kopiere, endre og distribuere datasettet, ogs\u00e5 til kommersielle",
+                  "form\u00e5l, uten \u00e5 be om tillatelse. Hvis datasettet er empirisk, er forfatterne oppgitt under",
+                  "'Referanser', vennligst siter de aktuelle referansene hvis det er tilfellet.")
+        } else {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        }
+    } else if (licNme == "DT_CC4-BY-NC-ND") {
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz enth\u00e4lt Daten einer wissenschaftlichen Studie, deren Urheberrecht bei den ",
+                   "Autoren der Studie liegt. Ohne die ausdr\u00fcckliche Zustimmung der Autoren ",
+                   rep(paste0("und von ", licHld, " "), nzchar(licHld)), "darf dieser Datensatz nicht zu ",
+                   "kommerziellen Zwecken verbreitet, bearbeitet oder verwendet werden ohne die Quelle anzugeben ",
+                   "(d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz).")
+        } else if (crrLng == "EN") {
+            paste0("This data set contains data of a scientific study and the study authors therefore own the ",
+                  "copyright. Without the study authors` ", rep(paste0("and ", licHld, "`s "), nzchar(licHld)),
+                  "explicit consent, this data set may not be distributed for commercial purposes, not be edited, ",
+                  "and not be used without acknowledging its source (i.e., the terms of a CC BY-NC-ND license).")
+        } else if (crrLng == "JP") {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet inneholder data fra en vitenskapelig studie, og studieforfatterne eier derfor ",
+                   "opphavsretten. Uten uttrykkelig samtykke fra studieforfatterne ",
+                   rep(paste0("og ", licHld, " "), nzchar(licHld)), "kan dette datasettet ikke distribueres for ",
+                   "kommersielle form\u00e5l, ikke redigeres og ikke brukes uten \u00e5 oppgi kilden (dvs. ",
+                   "vilk\u00e5rene i en CC BY-NC-ND-lisens).")
+        } else {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        }
+    } else if (licNme == "FC_CC4-BY-NC-ND") {
+        if        (licHld == "")
+            stop("When using this license, a license holder needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz wurde von ", licHld, " erstellt, der somit das Urheberrecht daran besitzt. ",
+                   "Ohne die ausdr\u00fcckliche Zustimmung von ", licHld, " darf dieser Datensatz nicht f\u00fcr ",
+                   "kommerzielle Zwecke verbreitet, nicht bearbeitet und nicht ohne Angabe der Quelle verwendet ",
+                   "werden (d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz).")
+        } else if (crrLng == "EN") {
+            paste0("This data set was constructed by ", licHld, ", who therefore owns the copyright. Without the ",
+                   "explicit consent of ", licHld, ", this data set may not be distributed for commercial purposes, ",
+                   "not be edited, and not be used without acknowledging its source (i.e., the terms of the CC ",
+                   "BY-NC-ND license).")
+        } else if (crrLng == "JP") {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        } else if (crrLng == "NB") {
+            paste0("Datasettet er utarbeidet av ", licHld, ", som derfor eier opphavsretten. Uten uttrykkelig ",
+                   "samtykke fra ", licHld, " kan dette datasettet ikke distribueres for kommersielle form\u00e5l, ",
+                   "redigeres eller brukes uten \u00e5 oppgi kilden (dvs. vilk\u00e5rene i CC BY-NC-ND-lisens).")
+        } else {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        }
+    } else if (licNme %in% c("RP_GPL2", "RP_GPL3", "RP_AGPL3", "RP_LGPL3")) {
+        licFlN <- c(rep("GNU General Public License 2.x",        licNme == "RP_GPL2"),
+                    rep("GNU General Public License 3.0",        licNme == "RP_GPL3"),
+                    rep("GNU Affero General Public License 3.0", licNme == "RP_AGPL3"),
+                    rep("GNU Lesser General Public License 3.0", licNme == "RP_LGPL3"))
+        if        (licHld == "")
+            stop("When using this license, the R-package where the data are originating from needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz ist Teil des R-Pakets '", licHld, ", das unter den Bedingungen der ", licFlN, " ",
+                   "ver\u00f6ffentlicht wurde. Sie k\u00f6nnen die Daten sowohl privat als auch kommerziell nutzen, ",
+                   "verbreiten oder ver\u00e4ndern. Bei der Verwendung des Datensatzes m\u00fcssen Sie die  Quelle ",
+                   "angeben und alle \u00e4nderungen, die Sie vornehmen, unter derselben Lizenz ",
+                   "ver\u00f6ffentlichen. Wenn der Datensatz auf empirischer Forschung basiert, sind die Autoren im ",
+                   "Abschnitt 'Referenzen' angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie den Datensatz ",
+                   "verwenden.")
+        } else if (crrLng == "EN") {
+            paste0("This data set was provided as part of the R-package '", licHld, "', which is published under ",
+                   "the terms of the ", licFlN, ". You may use the data both privately and commercially, distribute ",
+                   "or modify them. When using the data set, you need to disclose the source, and publish any ",
+                   "modifications you may make under the same license. If the data set is based on empirical data, ",
+                   "the authors are given in the 'References'-section. In such case, please  cite them when using ",
+                   "the dataset.")
+        } else if (crrLng == "JP") {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet er en del av R-pakken '", licHld, "', som er publisert under vilk\u00e5rene i ",
+                   licFlN, ". Du kan bruke dataene b\u00e5de privat og kommersielt, distribuere eller endre dem. ",
+                   "N\u00e5r du bruker datasettet, m\u00e5 du oppgi kilden og publisere eventuelle endringer du ",
+                   "gj\u00f8r under samme lisens. Hvis datasettet er basert p\u00e5 empiriske data, er forfatterne ",
+                   "oppgitt under 'Referanser'. Vennligst oppgi referansene i slike tilfeller n\u00e5r du bruker ",
+                   "datasettet.")
+        } else {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        }
+    } else {
+        c()
+    }
 }
 
 # check input parameters

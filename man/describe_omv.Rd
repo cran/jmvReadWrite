@@ -9,6 +9,7 @@ describe_omv(
   fleOut = "",
   dtaTtl = c(),
   dtaDsc = c(),
+  lngDsc = "EN",
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -26,6 +27,9 @@ returned instead}
 \item{dtaDsc}{Description of the data set, either as character vector (HTML-formatted) or as named list with the entries "description", "variables",
 "references", and "license" (see Details; default: "")}
 
+\item{lngDsc}{Language of the description (localizes the description components: "Description", "Variables", "References", and "License";
+default: "EN")}
+
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 base R), but "haven" is newer and more comprehensive}
 
@@ -42,20 +46,20 @@ Adds a title and a description for a data set stored as .omv-file for the statis
 \details{
 \itemize{
 \item The aim of this function is to add a title and a data set description to jamovi data files. Two typical use cases would be (1) to help creating data sets
-to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide ”properly
-described“ data when publishing in a repository such as the OSF).
+to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide "properly
+described" data when publishing in a repository such as the OSF).
 \item NB: The data set should not contain any existing analyses. These will be overwritten (a  warning is issued informing you about that).
-\item \code{dtaTtl} is a title for the dataset (at the top of the results output, i.e., that title which initially is “Results” when you create a new data set in
+\item \code{dtaTtl} is a title for the dataset (at the top of the results output, i.e., that title which initially is "Results" when you create a new data set in
 jamovi).
 \item \code{dtaDsc} can either be a character vector (with length = 1) containing HTML-formatted text that describes the data set (see \code{chrDsc} in the examples for
-HTML tags that are currently implemented; putting “unformatted” text is not a problem, but then the result is just plain text without formatting).
+HTML tags that are currently implemented; putting "unformatted" text is not a problem, but then the result is just plain text without formatting).
 Alternatively, \code{dtaDcs} can be a named list with the entries \code{description}, \code{variables}, \code{references}, \code{license}. All entries except from \code{variables}
 contain character vectors (length = 1); \code{variables} shall be a named list with the variable name as name and a description what the variable contains as
 entry. \code{description} and \code{variables} must be given, \code{references} and \code{license} can be left blank (""; but the names must be present in the list). An
 example for both a named list with a description (\code{lstDsc}), as well as a character vector with all HTML tags that are implemented (\code{chrDsc}) can be found
 in the examples below.
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
-on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+on the respective function under "See also", you can get a more detailed overview over which parameters each of those functions take. The functions are:
 \code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV
 which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs the R-package \code{haven}) or \code{read.spss}
 (needs the R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files,
@@ -88,12 +92,11 @@ unlink(nmeOut)
 
 # the code underneath should cover all formatting options jamovi is able to use (paste0 is only
 # for readability)
-chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bold</strong><br/>",
+chrDsc <- paste0("<p><strong>Trial - all formattings:</strong><br/><strong>bold</strong><br/>",
                  "<strong><em>bold, italics</em></strong><br/><em>italics</em><br/><u>underlined",
-                 "</u><br/>link:<a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\">https://",
-                 "jamovi.org﻿﻿﻿</a><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>",
-                 "OH<br/>R<sup>2</sup><br/><span style=\"background-color:#e60000\">background ",
-                 "colour: red</span><br/><span style=\"color:#e60000\">foreground color: red",
+                 "</u><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>OH<br/>R<sup>2",
+                 "</sup><br/><span style=\"background-color:#e60000\">background colour: red",
+                 "</span><br/><span style=\"color:#e60000\">foreground color: red",
                  "</span></p><p class=\"ql-align-center\">centered</p><p class=\"ql-align-right\">",
                  "right</p><p class=\"ql-align-justify\">justify justify justify justify justify ",
                  "justify justify justify justify justify justify justify justify justify justify ",
