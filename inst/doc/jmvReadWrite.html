@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sebastian Jentschke" />
 
-<meta name="date" content="2026-04-27" />
+<meta name="date" content="2026-07-13" />
 
 <title>R package jmvReadWrite</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">R package <code>jmvReadWrite</code></h1>
 <h4 class="author">Sebastian Jentschke</h4>
-<h4 class="date">2026-04-27</h4>
+<h4 class="date">2026-07-13</h4>
 
 
 
@@ -396,11 +396,11 @@ copied from there.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fleOMV <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;ToothGrowth.omv&quot;</span>, <span class="at">package =</span> <span class="st">&quot;jmvReadWrite&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>data <span class="ot">&lt;-</span> jmvReadWrite<span class="sc">::</span><span class="fu">read_omv</span>(fleOMV)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># if the &quot;jmv&quot;-package is installed, we can run a test analysis with the data</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;jmv&quot;</span> <span class="sc">%in%</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())) {</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nzchar</span>(<span class="fu">system.file</span>(<span class="at">package =</span> <span class="st">&quot;jmv&quot;</span>))) {</span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>    jmv<span class="sc">::</span><span class="fu">ANOVA</span>(</span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>        <span class="at">formula =</span> len <span class="sc">~</span> supp <span class="sc">+</span> dose <span class="sc">+</span> supp<span class="sc">:</span>dose,</span>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>        <span class="at">data =</span> data,</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>        <span class="at">effectSize =</span> <span class="fu">c</span>(<span class="st">&quot;omega&quot;</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>        <span class="at">effectSize =</span> <span class="st">&quot;omega&quot;</span>,</span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>        <span class="at">modelTest =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>        <span class="at">homo =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>        <span class="at">norm =</span> <span class="cn">TRUE</span>)</span>
@@ -454,7 +454,7 @@ shown in the following examples:</p>
 <span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(<span class="fu">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)) <span class="sc">&gt;=</span> <span class="dv">2</span>) {</span>
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    <span class="fu">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)</span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>    <span class="co"># if the &quot;jmv&quot;-package is installed, we can run the analyses in &quot;syntax&quot;</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    <span class="cf">if</span> (<span class="st">&quot;jmv&quot;</span> <span class="sc">%in%</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())) {</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">nzchar</span>(<span class="fu">system.file</span>(<span class="at">package =</span> <span class="st">&quot;jmv&quot;</span>))) {</span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>        <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)[[<span class="dv">1</span>]]))</span>
 <span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>        <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">&quot;result = &quot;</span>, <span class="fu">attr</span>(data, <span class="st">&quot;syntax&quot;</span>)[[<span class="dv">2</span>]])))</span>
 <span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>        <span class="fu">names</span>(result)</span>
@@ -492,7 +492,7 @@ jamovi afterwards.</p>
 <span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Trial.omv&quot;</span></span>
 <span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="fu">file.info</span>(<span class="st">&quot;Trial.omv&quot;</span>)[, <span class="fu">c</span>(<span class="st">&quot;size&quot;</span>, <span class="st">&quot;isdir&quot;</span>, <span class="st">&quot;mode&quot;</span>)]</span>
 <span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt;           size isdir mode</span></span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; Trial.omv 2618 FALSE  644</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; Trial.omv 2521 FALSE  644</span></span>
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">&quot;Trial.omv&quot;</span>)</span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a>
 permits to store <code>jamovi</code>-specific attributes (such as
